@@ -11,25 +11,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: "Check out code"
-        uses: actions/checkout@v4  # ← ✅ pathは絶対に書かない
+      - name: Check out code
+        uses: actions/checkout@v4
 
-      - name: "Set up Node.js"
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: "Install dependencies"
+      - name: Install dependencies
+        working-directory: .   # ✅ ルート直下を明示（frontend ではない）
         run: npm ci
 
-      - name: "Run ESLint"
+      - name: Run ESLint
+        working-directory: .
         run: npx eslint .
 
-      - name: "Run Prettier check"
+      - name: Run Prettier check
+        working-directory: .
         run: npx prettier --check .
 
-      - name: "Run Markdown rule check"
+      - name: Run Markdown rule check
+        working-directory: .
         run: node scripts/check-md-rules.js || echo "Markdown rule check failed"
 
-      - name: "Markdown契約・設計チェック"
+      - name: Markdown契約・設計チェック
+        working-directory: .
         run: node scripts/validate-md.js || echo "Markdown設計チェック失敗"
