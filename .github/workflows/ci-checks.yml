@@ -12,15 +12,12 @@ jobs:
 
     steps:
       - name: "Check out code"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4  # ← ✅ pathは絶対に書かない
 
       - name: "Set up Node.js"
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: "Check files in repo root"
-        run: ls -la
 
       - name: "Install dependencies"
         run: npm ci
