@@ -9,9 +9,6 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: .  # ✅ ルート直下で npm を探す
 
     steps:
       - name: Check out code
@@ -26,16 +23,21 @@ jobs:
         run: ls -la
 
       - name: Install dependencies
+        working-directory: ./  # ✅ ルート直下に固定
         run: npm ci
 
       - name: Run ESLint
+        working-directory: ./  # ✅ 同上
         run: npx eslint .
 
       - name: Run Prettier check
+        working-directory: ./  # ✅ 同上
         run: npx prettier --check .
 
       - name: Run Markdown validation
-        run: node scripts/check-md-rules.js || echo "Markdown rule check failed"
+        working-directory: ./scripts  # ✅ 実行ファイルがある場所に変更
+        run: node ../scripts/check-md-rules.js || echo "Markdown rule check failed"
 
       - name: Markdown契約・設計チェック
-        run: node scripts/validate-md.js || echo "Markdown design check failed"
+        working-directory: ./scripts  # ✅ 同上
+        run: node ../scripts/validate-md.js || echo "Markdown design check failed"
