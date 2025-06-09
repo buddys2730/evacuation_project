@@ -13,8 +13,6 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-        with:
-          path: '.'  # ✅ ルートにチェックアウトする
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -22,16 +20,16 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: cd frontend && npm ci
+        run: npm ci
 
       - name: Run ESLint
-        run: cd frontend && npx eslint .
+        run: npx eslint .
 
       - name: Run Prettier check
-        run: cd frontend && npx prettier --check .
+        run: npx prettier --check .
 
       - name: Run Markdown validation
-        run: cd frontend && node scripts/check-md-rules.js
+        run: node scripts/check-md-rules.js
 
       - name: Markdown契約・設計チェック
-        run: cd frontend && node scripts/validate-md.js
+        run: node scripts/validate-md.js
