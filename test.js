@@ -1,1 +1,1 @@
-var test = 1;
+const x = 1;

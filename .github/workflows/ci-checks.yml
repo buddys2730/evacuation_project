@@ -30,3 +30,7 @@ jobs:
 
       - name: Run Markdown validation
         run: node scripts/check-md-rules.js
+
+      - name: Markdown契約・設計チェック
+        run: node scripts/validate-md.js
+
