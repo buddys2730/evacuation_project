@@ -9,11 +9,13 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend  # ✅ frontend配下にある package.json を使う
 
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-        # ⚠️ 以下の `with: path: .` は削除すること！
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
