@@ -9,13 +9,12 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./  # ← ここを追加
 
     steps:
       - name: Check out code
         uses: actions/checkout@v4
+        with:
+          path: .  # ✅ ← これを追加（非常に重要）
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -36,4 +35,3 @@ jobs:
 
       - name: Markdown契約・設計チェック
         run: node scripts/validate-md.js
-
