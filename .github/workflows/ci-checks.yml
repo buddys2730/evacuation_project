@@ -14,10 +14,11 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Debug - Show current directory and files
-        run: |
-          echo "Working directory: $(pwd)"
-          ls -la
+      - name: Show current directory
+        run: pwd
+
+      - name: Show files
+        run: ls -la
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
