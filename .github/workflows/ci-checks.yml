@@ -11,12 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Debug - Show working directory
+      - name: Debug - Show current directory and files
         run: |
-          echo "Current directory: $(pwd)"
+          echo "Working directory: $(pwd)"
           ls -la
 
       - name: Set up Node.js
@@ -38,6 +38,8 @@ jobs:
 
       - name: Run Markdown rule check
         run: node scripts/check-md-rules.js || echo "Markdown rule check skipped"
+        working-directory: ./
 
       - name: Markdown契約・設計チェック
         run: node scripts/validate-md.js || echo "契約チェック skipped"
+        working-directory: ./
