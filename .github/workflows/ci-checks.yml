@@ -13,11 +13,17 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
+        # 👇❌ この "path: ." は絶対に不要！削除！！
+        # with:
+        #   path: .
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+
+      - name: Debug: show location and files
+        run: pwd && ls -la
 
       - name: Install dependencies
         run: npm ci
@@ -29,7 +35,7 @@ jobs:
         run: npx prettier --check .
 
       - name: Run Markdown validation
-        run: node scripts/check-md-rules.js || echo "check-md-rules failed"
+        run: node scripts/check-md-rules.js || echo "md-rules failed"
 
       - name: Markdown契約・設計チェック
         run: node scripts/validate-md.js || echo "validate-md failed"
