@@ -11,34 +11,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out code
+      - name: "Check out code"
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: "Set up Node.js"
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Debug check files
+      - name: "Check files in repo root"
         run: ls -la
-        working-directory: frontend
 
-      - name: Install dependencies
+      - name: "Install dependencies"
         run: npm ci
-        working-directory: frontend
 
-      - name: Run ESLint
+      - name: "Run ESLint"
         run: npx eslint .
-        working-directory: frontend
 
-      - name: Run Prettier check
+      - name: "Run Prettier check"
         run: npx prettier --check .
-        working-directory: frontend
 
-      - name: Run Markdown validation
+      - name: "Run Markdown rule check"
         run: node scripts/check-md-rules.js || echo "Markdown rule check failed"
-        working-directory: frontend
 
-      - name: Markdown契約・設計チェック
-        run: node scripts/validate-md.js || echo "Markdown design check failed"
-        working-directory: frontend
+      - name: "Markdown契約・設計チェック"
+        run: node scripts/validate-md.js || echo "Markdown設計チェック失敗"
