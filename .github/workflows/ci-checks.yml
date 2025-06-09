@@ -2,9 +2,9 @@ name: CI Checks
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   validate:
@@ -14,11 +14,10 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Show current directory
-        run: pwd
-
-      - name: Show files
-        run: ls -la
+      - name: Debug - Show current directory and files
+        run: |
+          echo "Working directory: $(pwd)"
+          ls -la
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -39,4 +38,3 @@ jobs:
 
       - name: Markdown契約・設計チェック
         run: node scripts/validate-md.js || echo "契約チェック skipped"
-# dummy trigger
