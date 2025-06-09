@@ -19,25 +19,25 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Debug: 確認のためのls
+      - name: Debug: check files
         run: ls -la
 
       - name: Install dependencies
-        working-directory: ./  # ✅ ルート直下に固定
         run: npm ci
+        working-directory: ./  # ✅ 正しい位置（runの「下」ではなく「横」）
 
       - name: Run ESLint
-        working-directory: ./  # ✅ 同上
         run: npx eslint .
+        working-directory: ./  # ✅ 正しい位置
 
       - name: Run Prettier check
-        working-directory: ./  # ✅ 同上
         run: npx prettier --check .
+        working-directory: ./  # ✅ 正しい位置
 
       - name: Run Markdown validation
-        working-directory: ./scripts  # ✅ 実行ファイルがある場所に変更
-        run: node ../scripts/check-md-rules.js || echo "Markdown rule check failed"
+        run: node scripts/check-md-rules.js || echo "Markdown rule check failed"
+        working-directory: ./  # ✅ 正しい位置
 
       - name: Markdown契約・設計チェック
-        working-directory: ./scripts  # ✅ 同上
-        run: node ../scripts/validate-md.js || echo "Markdown design check failed"
+        run: node scripts/validate-md.js || echo "Markdown design check failed"
+        working-directory: ./  # ✅ 正しい位置
