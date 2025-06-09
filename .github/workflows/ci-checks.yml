@@ -12,7 +12,8 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v4  # ← ここに `with.path` は不要
+        uses: actions/checkout@v4
+        # ⚠️ 以下の `with: path: .` は削除すること！
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
