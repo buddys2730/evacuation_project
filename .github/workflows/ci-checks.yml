@@ -12,9 +12,7 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
-        with:
-          path: evacuation_project  # ✅ ここでcheckout先ディレクトリを指定（二重展開対策）
+        uses: actions/checkout@v4  # ✅ ← 余計な path: は削除！！
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -22,21 +20,16 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        working-directory: evacuation_project  # ✅ ルートの package.json を見に行かせる
         run: npm ci
 
       - name: Run ESLint
-        working-directory: evacuation_project
         run: npx eslint .
 
       - name: Run Prettier check
-        working-directory: evacuation_project
         run: npx prettier --check .
 
       - name: Run Markdown validation
-        working-directory: evacuation_project
         run: node scripts/check-md-rules.js || echo "check-md-rules failed"
 
       - name: Markdown契約・設計チェック
-        working-directory: evacuation_project
         run: node scripts/validate-md.js || echo "validate-md failed"
