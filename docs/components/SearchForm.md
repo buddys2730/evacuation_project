@@ -1,29 +1,34 @@
 # SearchForm コンポーネント定義書
 
 ## 📌 コンポーネントの目的
+
 避難所検索のためのフォームUIを提供し、検索パラメータ（市区町村名・災害種別・検索半径など）を収集する。
 
 ## 📂 配置パス
+
 `frontend/src/components/SearchForm.js`
 
 ## 📥 入力 Props
 
-| プロパティ名      | 型         | 必須 | 説明                                  |
-|------------------|------------|------|---------------------------------------|
-| `onResults`      | Function   | ✅   | 検索結果（配列）を親に渡すコールバック |
-| `onSearchParams` | Function   | ✅   | 検索時に使用したパラメータを渡す       |
-| `defaultRadius`  | number     | ❌   | デフォルト検索半径（km単位）           |
-| `setUserLocation`| Function   | ✅   | 現在地を App に保存する関数            |
+| プロパティ名      | 型       | 必須 | 説明                                   |
+| ----------------- | -------- | ---- | -------------------------------------- |
+| `onResults`       | Function | ✅   | 検索結果（配列）を親に渡すコールバック |
+| `onSearchParams`  | Function | ✅   | 検索時に使用したパラメータを渡す       |
+| `defaultRadius`   | number   | ❌   | デフォルト検索半径（km単位）           |
+| `setUserLocation` | Function | ✅   | 現在地を App に保存する関数            |
 
 ## 📤 出力内容
+
 - ユーザーの検索条件に基づいて API にリクエストを送り、避難所情報の配列を取得
 - 現在地の取得とセット
 
 ## 🔗 依存関係
+
 - API `/api/search`
 - `navigator.geolocation.getCurrentPosition`
 
 ## 🔁 呼び出し元
+
 - `App.js` または `MainPage.js`
 
 ## ✅ 開発契約チェック項目
@@ -34,6 +39,7 @@
 - [x] `onSearchParams` は正しい構造で渡されているか？
 
 ## 🚨 違反禁止事項（契約）
+
 - 直接 `fetch` 内で UI を変更してはならない
 - 非同期エラー時に try-catch を省略してはならない
 - `setUserLocation` が undefined のまま処理されてはならない（→ 重大バグ）
