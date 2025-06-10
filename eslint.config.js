@@ -1,4 +1,5 @@
-// 新形式の ESLint 設定（ESLint v9 対応）
+import eslintPluginNode from 'eslint-plugin-node';
+
 export default [
   {
     ignores: ['node_modules', 'dist'],
@@ -10,10 +11,14 @@ export default [
     linterOptions: {
       reportUnusedDisableDirectives: true,
     },
+    plugins: {
+      node: eslintPluginNode,
+    },
     rules: {
       'no-unused-vars': 'warn',
       'no-console': 'off',
-      semi: ['error', 'always'],
+      'semi': ['error', 'always'],
+      'node/no-deprecated-api': 'error',
     },
   },
 ];
