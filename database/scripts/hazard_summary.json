@@ -1,0 +1,10 @@
+{
+  "hazard_flood": 71544,
+  "hazard_landslide": 67100,
+  "hazard_storm_surge": 24550,
+  "hazard_earthquake": 87631,
+  "hazard_tsunami": 40055,
+  "hazard_fire": 42790,
+  "hazard_inland_flood": 38354,
+  "hazard_volcano": 10658
+}
