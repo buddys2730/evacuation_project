@@ -1,0 +1,22 @@
+{
+  "name": "evacuation_project",
+  "version": "1.0.0",
+  "type": "module",
+  "devDependencies": {
+    "eslint": "^9.28.0",
+    "eslint-plugin-react": "^7.37.5",
+    "glob": "^11.0.2",
+    "husky": "^8.0.0",
+    "lint-staged": "^16.1.0",
+    "prettier": "^3.5.3"
+  },
+  "scripts": {
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
+}
