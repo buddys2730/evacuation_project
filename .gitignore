@@ -18,3 +18,4 @@ npm-debug.log*
 *.sql
 .env
 .env.*
+*.sql
