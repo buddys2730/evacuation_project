@@ -1,0 +1,42 @@
+name: CI Checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - name: ✅ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🧹 Run Prettier check
+        run: |
+          npx prettier --check \
+            "frontend/**/*.{js,jsx,json,css,md}" \
+            "docs/**/*.md" \
+            "scripts/**/*.js"
+
+      - name: 🧪 Run ESLint (Flat Config)
+        run: npx eslint .
+
+      - name: 📄 Validate Markdown rule consistency
+        run: |
+          node scripts/check-md-rules.js
+          node scripts/validate-md.js
