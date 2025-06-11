@@ -25,3 +25,7 @@ jobs:
         run: node scripts/auto-update-md-rules.js
       - name: Markdown rule validate
         run: node scripts/validate-md.js
+      - name: Lint frontend
+        run: |
+        cd frontend
+        npx eslint src --ext js,jsx --ignore-pattern node_modules/**
