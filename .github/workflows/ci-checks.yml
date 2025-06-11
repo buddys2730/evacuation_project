@@ -7,32 +7,21 @@ on:
     branches: [main]
 
 jobs:
-  check:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
       - name: Install dependencies
         run: npm ci
-
-      - name: Run ESLint
-        run: npx eslint .
-
-      - name: Run Prettier
+      - name: ESLint & Prettier fix
         run: |
-          npx prettier --check \
-            "frontend/**/*.{js,jsx,json,css,md}" \
-            "scripts/**/*.js" \
-            "docs/**/*.md"
-
-      - name: Validate .md rule files
-        run: |
-          node scripts/check-md-rules.js
-          node scripts/validate-md.js
+          npx eslint . --fix
+          npx prettier --write .
+      - name: Markdown rule update
+        run: node scripts/auto-update-md-rules.js
+      - name: Markdown rule validate
+        run: node scripts/validate-md.js

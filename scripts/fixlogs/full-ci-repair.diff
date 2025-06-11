@@ -1,0 +1,107 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 8dbbb7d..2b9ed77 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -36,7 +36,6 @@ jobs:
+             "backend/**/*.{py,json,md}" \
+             "docs/**/*.md" \
+             "scripts/**/*.js"
+-        
++
+       - name: Check Markdown design & contract rules
+         run: node scripts/validate-md.js
+-
+diff --git a/.md_rules.json b/.md_rules.json
+index aca410f..8356903 100755
+--- a/.md_rules.json
++++ b/.md_rules.json
+@@ -1,7 +1,5 @@
+ {
+-  "monitor": [
+-    "docs/**/*.md"
+-  ],
++  "monitor": ["docs/**/*.md"],
+   "rules": {
+     "開発実行責任.md": [
+       "契約条件: 本ドキュメントは開発の一貫性・責任を担保するものであり、変更時は承認を必要とする",
+@@ -34,7 +32,5 @@
+       "変更記録: 変更理由、日時、責任者が必ず明記されること"
+     ]
+   },
+-  "ignore": [
+-    "test_invalid.md"
+-  ]
+-}
+\ No newline at end of file
++  "ignore": ["test_invalid.md"]
++}
+diff --git a/eslint.config.js b/eslint.config.js
+index 715f336..884c61f 100644
+--- a/eslint.config.js
++++ b/eslint.config.js
+@@ -1,22 +1,22 @@
+-import js from "@eslint/js";
+-import babelParser from "@babel/eslint-parser";
+-import react from "eslint-plugin-react";
+-import prettierPlugin from "eslint-plugin-prettier";
+-import prettierConfig from "eslint-config-prettier";
++import js from '@eslint/js';
++import babelParser from '@babel/eslint-parser';
++import react from 'eslint-plugin-react';
++import prettierPlugin from 'eslint-plugin-prettier';
++import prettierConfig from 'eslint-config-prettier';
+ 
+ export default [
+   js.configs.recommended,
+   {
+-    files: ["**/*.{js,jsx}"],
++    files: ['**/*.{js,jsx}'],
+     languageOptions: {
+       parser: babelParser,
+       parserOptions: {
+         requireConfigFile: false,
+         babelOptions: {
+-          presets: ["@babel/preset-react"],
++          presets: ['@babel/preset-react'],
+         },
+-        ecmaVersion: "latest",
+-        sourceType: "module",
++        ecmaVersion: 'latest',
++        sourceType: 'module',
+         ecmaFeatures: { jsx: true },
+       },
+       globals: {
+@@ -40,15 +40,15 @@ export default [
+     rules: {
+       ...react.configs.recommended.rules,
+       ...prettierConfig.rules,
+-      "prettier/prettier": "warn",
+-      "react/react-in-jsx-scope": "off",
+-      "no-undef": "off",
++      'prettier/prettier': 'warn',
++      'react/react-in-jsx-scope': 'off',
++      'no-undef': 'off',
+     },
+     settings: {
+       react: {
+-        version: "detect",
++        version: 'detect',
+       },
+     },
+-    ignores: ["node_modules/**"],
++    ignores: ['node_modules/**'],
+   },
+ ];
+diff --git a/frontend/node_modules 2/ansi-html-community 2/index 2.js b/frontend/node_modules 2/ansi-html-community 2/index 2.js
+index 5bc30f6..e716e39 100755
+--- a/frontend/node_modules 2/ansi-html-community 2/index 2.js	
++++ b/frontend/node_modules 2/ansi-html-community 2/index 2.js	
+@@ -64,7 +64,7 @@ function ansiHTML(text) {
+     var ot = _openTags[seq];
+     if (ot) {
+       // If current sequence has been opened, close it.
+-      if (!!~ansiCodes.indexOf(seq)) {
++      if (~ansiCodes.indexOf(seq)) {
+         ansiCodes.pop();
+         return '</span>';
+       }
