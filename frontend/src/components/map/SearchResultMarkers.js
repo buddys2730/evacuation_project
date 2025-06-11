@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 // /components/map/SearchResultMarkers.js
 import React, { useState } from 'react';
 import { Marker, InfoWindow } from '@react-google-maps/api';
@@ -43,3 +44,7 @@ const SearchResultMarkers = ({ results, selectedPoint, setSelectedPoint }) => {
 };
 
 export default SearchResultMarkers;
+
+SearchResultMarkers.propTypes = {
+  // 自動挿入: 必要に応じて手動で編集してください
+};

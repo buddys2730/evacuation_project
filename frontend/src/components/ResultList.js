@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const ResultList = ({ points, selectedId, onSelect }) => {
@@ -29,3 +30,7 @@ const ResultList = ({ points, selectedId, onSelect }) => {
 };
 
 export default ResultList;
+
+ResultList.propTypes = {
+  // 自動挿入: 必要に応じて手動で編集してください
+};

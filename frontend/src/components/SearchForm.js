@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 // /Users/masashitakao/Desktop/evacuation_project/frontend/src/components/SearchForm.js
 
 import React, { useEffect, useState } from 'react';
@@ -223,3 +224,7 @@ const SearchForm = ({
 };
 
 export default SearchForm;
+
+SearchForm.propTypes = {
+  // 自動挿入: 必要に応じて手動で編集してください
+};
