@@ -8,12 +8,7 @@ const ARView = () => {
   const evacData = location.state;
 
   useEffect(() => {
-    if (
-      !evacData ||
-      !evacData.latitude ||
-      !evacData.longitude ||
-      !evacData.name
-    ) {
+    if (!evacData || !evacData.latitude || !evacData.longitude || !evacData.name) {
       alert('避難所データが不足しています。');
       return;
     }

@@ -13,15 +13,11 @@ const MainPage = () => {
   const [directions, setDirections] = useState(null);
   const [radiusKm, setRadiusKm] = useState(3);
   const [hazardDisplayMode, setHazardDisplayMode] = useState('off');
-  const [selectedCategories, setSelectedCategories] = useState([
-    '洪水_01_計画規模',
-  ]);
+  const [selectedCategories, setSelectedCategories] = useState(['洪水_01_計画規模']);
 
   const toggleCategory = (category) => {
     setSelectedCategories((prev) =>
-      prev.includes(category)
-        ? prev.filter((c) => c !== category)
-        : [...prev, category]
+      prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
     );
   };
 
@@ -72,10 +68,7 @@ const MainPage = () => {
       </div>
 
       {hazardDisplayMode === 'hazard' && (
-        <CategoryFilter
-          selectedCategories={selectedCategories}
-          toggleCategory={toggleCategory}
-        />
+        <CategoryFilter selectedCategories={selectedCategories} toggleCategory={toggleCategory} />
       )}
 
       <MapComponent

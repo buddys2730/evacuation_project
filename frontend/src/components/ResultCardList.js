@@ -47,10 +47,7 @@ const ResultCardList = ({
               key={idx}
               onClick={() => handleCardClick(point)}
               style={{
-                border:
-                  selectedPoint?.id === point.id
-                    ? '2px solid red'
-                    : '1px solid #ccc',
+                border: selectedPoint?.id === point.id ? '2px solid red' : '1px solid #ccc',
                 padding: '10px',
                 marginBottom: '10px',
                 cursor: 'pointer',
@@ -59,9 +56,7 @@ const ResultCardList = ({
             >
               <h4>{point.name}</h4>
               <p>{point.address}</p>
-              {userLocation && point.distance && (
-                <p>距離: {point.distance.toFixed(2)} km</p>
-              )}
+              {userLocation && point.distance && <p>距離: {point.distance.toFixed(2)} km</p>}
             </div>
           ))}
         </div>

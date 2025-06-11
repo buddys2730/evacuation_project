@@ -55,9 +55,7 @@ const MapComponent = ({
     hazardPolygons.map((poly, idx) => (
       <Polygon
         key={idx}
-        paths={poly.coordinates.map((ring) =>
-          ring.map(([lng, lat]) => ({ lat, lng }))
-        )}
+        paths={poly.coordinates.map((ring) => ring.map(([lng, lat]) => ({ lat, lng })))}
         options={{
           fillColor: '#ff0000',
           fillOpacity: 0.3,
@@ -129,57 +127,57 @@ const MapComponent = ({
         {/* ルート案内 */}
         {directions && <DirectionsRenderer directions={directions} />}
         {/* ルートの安全性チェックボタン */}
-{directions && (
-  <button
-    style={{
-      position: 'absolute',
-      top: '10px',
-      left: '10px',
-      zIndex: 10,
-      padding: '8px 12px',
-      backgroundColor: '#1976d2',
-      color: '#fff',
-      border: 'none',
-      borderRadius: '4px',
-    }}
-    onClick={async () => {
-      const routePoints = directions.routes[0].overview_path.map((point) => ({
-        lat: point.lat(),
-        lng: point.lng(),
-      }));
+        {directions && (
+          <button
+            style={{
+              position: 'absolute',
+              top: '10px',
+              left: '10px',
+              zIndex: 10,
+              padding: '8px 12px',
+              backgroundColor: '#1976d2',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+            }}
+            onClick={async () => {
+              const routePoints = directions.routes[0].overview_path.map((point) => ({
+                lat: point.lat(),
+                lng: point.lng(),
+              }));
 
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_BASE_URL}/api/route-safety`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ route: routePoints }),
-          }
-        );
+              try {
+                const response = await fetch(
+                  `${process.env.REACT_APP_API_BASE_URL}/api/route-safety`,
+                  {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ route: routePoints }),
+                  }
+                );
 
-        const data = await response.json();
-        if (data.status === 'success') {
-          if (data.result.status === 'danger') {
-            alert('⚠️ 危険な地点が含まれています！');
-            console.warn('危険ポイント:', data.result.dangerous_points);
-          } else {
-            alert('✅ このルートは安全です。');
-          }
-        } else {
-          alert('⚠️ 判定エラー: ' + data.message);
-        }
-      } catch (err) {
-        console.error('❌ APIエラー:', err);
-        alert('❌ 通信に失敗しました');
-      }
-    }}
-  >
-    このルートの安全性をチェック
-  </button>
-)}
+                const data = await response.json();
+                if (data.status === 'success') {
+                  if (data.result.status === 'danger') {
+                    alert('⚠️ 危険な地点が含まれています！');
+                    console.warn('危険ポイント:', data.result.dangerous_points);
+                  } else {
+                    alert('✅ このルートは安全です。');
+                  }
+                } else {
+                  alert('⚠️ 判定エラー: ' + data.message);
+                }
+              } catch (err) {
+                console.error('❌ APIエラー:', err);
+                alert('❌ 通信に失敗しました');
+              }
+            }}
+          >
+            このルートの安全性をチェック
+          </button>
+        )}
 
         {/* ハザードポリゴン */}
         {hazardDisplayMode === 'hazard' && renderPolygons()}

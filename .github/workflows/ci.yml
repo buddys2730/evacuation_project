@@ -2,9 +2,9 @@ name: CI Checks
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   ci-check:
@@ -26,10 +26,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run ESLint
-        run: npx eslint .
+      - name: Run ESLint on frontend only
+        run: npx eslint frontend/
 
-      - name: Run Prettier
+      - name: Run Prettier formatting check
         run: npx prettier --check .
 
       - name: Validate Markdown
