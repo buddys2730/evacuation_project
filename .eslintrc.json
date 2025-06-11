@@ -1,18 +1,21 @@
 {
-  "env": {
-    "browser": true,
-    "es2021": true
-  },
-  "extends": ["eslint:recommended", "plugin:react/recommended"],
+  "root": true,
   "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true
-    },
     "ecmaVersion": "latest",
-    "sourceType": "module"
+    "sourceType": "module",
+    "ecmaFeatures": { "jsx": true }
   },
-  "plugins": ["react"],
+  "plugins": ["react", "node"],
+  "extends": ["eslint:recommended", "plugin:react/recommended"],
   "rules": {
-    "react/prop-types": "off"
-  }
+    "node/no-deprecated-api": "warn"
+  },
+  "settings": { "react": { "version": "detect" } },
+  "ignorePatterns": [
+    "node_modules/*",
+    "frontend/node_modules/*",
+    "scripts/*",
+    "test.js",
+    "test3.js"
+  ]
 }
