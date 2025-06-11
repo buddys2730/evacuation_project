@@ -1,23 +1,37 @@
-import eslintPluginNode from 'eslint-plugin-node';
-
-export default [
-  {
-    ignores: ['node_modules', 'dist', 'frontend/node_modules 2'], // ここで明示的に無視対象を設定
-    files: ['**/*.js', '**/*.jsx'],
-    languageOptions: {
-      ecmaVersion: 2022,
-      sourceType: 'module',
+// eslint.config.js
+module.exports = {
+  root: true,
+  parser: "@babel/eslint-parser",
+  parserOptions: {
+    ecmaVersion: 2021,
+    sourceType: "module",
+    ecmaFeatures: {
+      jsx: true,
     },
-    linterOptions: {
-      reportUnusedDisableDirectives: true,
-    },
-    plugins: {
-      node: eslintPluginNode,
-    },
-    rules: {
-      'no-unused-vars': 'warn',
-      'no-console': 'off',
-      semi: ['error', 'always'],
+    requireConfigFile: false,
+    babelOptions: {
+      presets: ["@babel/preset-react"],
     },
   },
-];
+  env: {
+    browser: true,
+    es2021: true,
+    node: true,
+  },
+  extends: [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:prettier/recommended"
+  ],
+  plugins: ["react", "prettier"],
+  rules: {
+    "prettier/prettier": "warn",
+    "react/react-in-jsx-scope": "off", // React 17+では不要
+    "react/prop-types": "off" // 型チェックを使用していない場合
+  },
+  settings: {
+    react: {
+      version: "detect",
+    },
+  },
+};
