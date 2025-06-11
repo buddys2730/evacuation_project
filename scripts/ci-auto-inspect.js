@@ -21,7 +21,7 @@ const categorized = {
   md: [],
   yml: [],
   json: [],
-  others: []
+  others: [],
 };
 
 allFiles.forEach((file) => {
