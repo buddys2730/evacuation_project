@@ -13,7 +13,6 @@
   "scripts": {
     "prepare": "if [ -d .git ]; then npx husky install; else echo 'CI環境のためhuskyをスキップ'; fi"
   },
-
   "lint-staged": {
     "src/**/*.{js,jsx}": [
       "eslint --fix",
