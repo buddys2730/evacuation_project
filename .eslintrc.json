@@ -6,15 +6,17 @@
     "ecmaFeatures": { "jsx": true }
   },
   "plugins": ["react", "node"],
-  "extends": ["eslint:recommended", "plugin:react/recommended"],
+  "extends": ["eslint:recommended", "plugin:node/recommended", "plugin:react/recommended"],
   "rules": {
     "node/no-deprecated-api": "warn"
   },
-  "settings": { "react": { "version": "detect" } },
+  "settings": {
+    "react": { "version": "detect" }
+  },
   "ignorePatterns": [
-    "node_modules/*",
-    "frontend/node_modules/*",
-    "scripts/*",
+    "node_modules/**",
+    "frontend/node_modules/**",
+    "scripts/**",
     "test.js",
     "test3.js"
   ]
