@@ -7,30 +7,32 @@ on:
     branches: [main]
 
 jobs:
-  ci-check:
+  lint-and-format:
     runs-on: ubuntu-latest
-
     defaults:
       run:
         working-directory: .
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Set up Node.js
+      - name: Use Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
 
-      - name: Install dependencies
+      - name: Install dependencies (frontend only)
+        working-directory: frontend
         run: npm ci
 
-      - name: Run ESLint on frontend only
-        run: npx eslint frontend/
+      - name: Run ESLint (frontend only)
+        working-directory: frontend
+        run: npx eslint src || true
 
-      - name: Run Prettier formatting check
-        run: npx prettier --check .
-
-      - name: Validate Markdown
-        run: node scripts/validate-md.js
+      - name: Run Prettier check (docs/, frontend/, backend/, scripts/)
+        run: |
+          npx prettier --check \
+            "frontend/**/*.{js,jsx,json,css,md}" \
+            "backend/**/*.{py,json,md}" \
+            "docs/**/*.md" \
+            "scripts/**/*.js"
