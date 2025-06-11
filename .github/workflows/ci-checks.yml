@@ -20,19 +20,19 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Run ESLint (Flat Config対応)
+      - name: Run ESLint
         run: npx eslint .
 
-      - name: Run Prettier check
+      - name: Run Prettier
         run: |
           npx prettier --check \
             "frontend/**/*.{js,jsx,json,css,md}" \
             "scripts/**/*.js" \
             "docs/**/*.md"
 
-      - name: Run Markdown rules check
+      - name: Validate .md rule files
         run: |
           node scripts/check-md-rules.js
           node scripts/validate-md.js
