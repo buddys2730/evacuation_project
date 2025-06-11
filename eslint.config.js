@@ -1,0 +1,11 @@
+export default [
+  {
+    ignores: [
+      'node_modules/**',
+      'frontend/node_modules/**',
+      'scripts/**',
+      'test.js',
+      'test3.js'
+    ]
+  }
+];
