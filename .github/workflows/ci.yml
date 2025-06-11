@@ -36,3 +36,7 @@ jobs:
             "backend/**/*.{py,json,md}" \
             "docs/**/*.md" \
             "scripts/**/*.js"
+        
+      - name: Check Markdown design & contract rules
+        run: node scripts/validate-md.js
+
