@@ -8,12 +8,21 @@ export default [
   {
     files: ["**/*.{js,jsx}"],
     languageOptions: {
-      ecmaVersion: 2021,
+      ecmaVersion: "latest",
       sourceType: "module",
       globals: {
+        process: true,
+        console: true,
+        fetch: true,
+        URL: true,
+        performance: true,
+        module: true,
+        require: true,
+        __dirname: true,
         window: true,
         document: true,
         navigator: true,
+        setTimeout: true,
       },
     },
     plugins: {
@@ -25,7 +34,7 @@ export default [
       ...prettierConfig.rules,
       "prettier/prettier": "warn",
       "react/react-in-jsx-scope": "off",
-      "react/prop-types": "off",
+      "no-undef": "off"
     },
     settings: {
       react: {
