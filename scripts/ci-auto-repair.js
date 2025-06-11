@@ -1,49 +1,40 @@
-// File: scripts/ci-auto-repair.js
+// scripts/ci-auto-repair.js
 
 import { execSync } from 'child_process';
 import fs from 'fs';
 
-function run(command, silent = false) {
+function runCommand(cmd, desc) {
   try {
-    const output = execSync(command, { stdio: silent ? 'pipe' : 'inherit' });
-    if (silent) return output.toString().trim();
+    console.log(`\n🚀 ${desc}`);
+    const output = execSync(cmd, { stdio: 'inherit' });
+    return output;
   } catch (err) {
-    if (!silent) console.error(`
-❌ Error running: ${command}\n${err}`);
+    console.error(`❌ ${desc} に失敗しました`);
+    process.exit(1);
   }
 }
 
-function logStep(message) {
-  console.log(`\n🚀 ${message}`);
-}
-
-function commitAndPushIfChanged() {
-  const status = run('git status --porcelain', true);
-  if (status) {
-    logStep('変更をコミット＆プッシュ中...');
-    run('git add .');
-    run('git commit -m "Fix: Auto CI repair (ESLint/Markdown/Props)"');
-    run('git push origin main');
-  } else {
-    console.log('✅ 修正すべき変更はありませんでした。');
+function commitIfChanged(message) {
+  try {
+    const changed = execSync('git status --porcelain').toString().trim();
+    if (changed) {
+      runCommand('git add .', 'git add');
+      runCommand(`git commit -m "${message}"`, 'git commit');
+      runCommand('git push origin main', 'git push');
+      console.log('✅ Git への自動コミット完了');
+    } else {
+      console.log('✅ Git に差分はありません');
+    }
+  } catch (err) {
+    console.error('❌ Git 処理でエラー');
+    process.exit(1);
   }
 }
 
-function main() {
-  logStep('Prettier を自動フォーマット');
-  run('npx prettier --write .');
+// 実行処理
+runCommand('npx prettier --write .', 'Prettier フォーマット');
+runCommand('npx eslint . --fix', 'ESLint 自動修正');
+runCommand('npm run update-md-rules', 'Markdown ルール更新');
+runCommand('npm run validate-md', 'Markdown ルール検証');
 
-  logStep('ESLint 自動修正');
-  run('npx eslint . --fix');
-
-  logStep('Markdown ルール自動更新');
-  run('npm run update-md-rules');
-
-  logStep('Markdown ルール自動検証');
-  run('npm run validate-md');
-
-  commitAndPushIfChanged();
-  console.log('\n✅ 全自動CI修復完了！GitHub Actionsが再実行されます。');
-}
-
-main();
+commitIfChanged('CI: Prettier/ESLint/Markdownルール自動修復')
