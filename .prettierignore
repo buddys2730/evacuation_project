@@ -1,6 +1,1 @@
-node_modules
-database/**/*.sql
-database/**/*.geojson
-docs/**/*.md
-scripts/**/*.js
-test*.js
+**/*.py
