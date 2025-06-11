@@ -7,8 +7,6 @@ import os
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 load_dotenv(dotenv_path=os.path.join(BASE_DIR, ".env"))
 
-
-
 # Blueprint の読み込み
 from routes.search import search_bp
 from routes.route_check import route_check_bp

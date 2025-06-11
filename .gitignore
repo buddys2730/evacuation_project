@@ -1,6 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+venv/
+
+# Node
 node_modules/
-.env
+npm-debug.log*
+
+# System
 .DS_Store
+# 両方残す例
 *.sql
+# 他の人の追加内容（必要な場合）
+
+# または、適切な方だけ残す
 *.sql
-*.sql
+.env
+.env.*
