@@ -11,8 +11,7 @@ rulesData.monitor.forEach((pattern) => {
   const files = glob.sync(pattern);
 
   files.forEach((file) => {
-    if (rulesData.ignore && rulesData.ignore.includes(path.basename(file)))
-      return;
+    if (rulesData.ignore && rulesData.ignore.includes(path.basename(file))) return;
 
     const content = fs.readFileSync(file, 'utf8');
     const fileName = path.basename(file);

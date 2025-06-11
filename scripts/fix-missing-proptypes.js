@@ -2,7 +2,7 @@
 import fs from 'fs';
 import glob from 'glob';
 const files = glob.sync('frontend/src/components/**/*.js');
-files.forEach(file => {
+files.forEach((file) => {
   let src = fs.readFileSync(file, 'utf8');
   if (!/\.propTypes/.test(src)) {
     const m = src.match(/const (\w+)\s*=\s*\(/);

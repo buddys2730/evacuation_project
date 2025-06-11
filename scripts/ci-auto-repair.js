@@ -37,4 +37,4 @@ runCommand('npx eslint . --fix', 'ESLint 自動修正');
 runCommand('npm run update-md-rules', 'Markdown ルール更新');
 runCommand('npm run validate-md', 'Markdown ルール検証');
 
-commitIfChanged('CI: Prettier/ESLint/Markdownルール自動修復')
+commitIfChanged('CI: Prettier/ESLint/Markdownルール自動修復');
