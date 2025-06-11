@@ -27,11 +27,12 @@ jobs:
         run: npm ci
 
       - name: 🧹 Run Prettier check
-        run: |
-          npx prettier --check \
-            "frontend/**/*.{js,jsx,json,css,md}" \
-            "docs/**/*.md" \
-            "scripts/**/*.js"
+  run: |
+    npx prettier --check \
+      "frontend/**/*.{js,jsx,json,css,md}" \
+      "docs/**/*.md" \
+      "scripts/**/*.js"
+
 
       - name: 🧪 Run ESLint (Flat Config)
         run: npx eslint .
