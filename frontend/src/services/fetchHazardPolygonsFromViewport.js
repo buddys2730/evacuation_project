@@ -1,6 +1,5 @@
 // /frontend/src/services/fetchHazardPolygonsFromViewport.js
-const API_BASE_URL =
-  process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001';
 
 export async function fetchHazardPolygonsFromViewport(bounds, category) {
   if (!bounds || !bounds.getSouthWest || !bounds.getNorthEast) {
@@ -29,9 +28,7 @@ export async function fetchHazardPolygonsFromViewport(bounds, category) {
 
     const data = await response.json();
     const elapsed = (performance.now() - start).toFixed(2);
-    console.log(
-      `✅ fetchHazardPolygonsFromViewport: ${data.length} 件, ${elapsed} ms`
-    );
+    console.log(`✅ fetchHazardPolygonsFromViewport: ${data.length} 件, ${elapsed} ms`);
 
     return data;
   } catch (error) {

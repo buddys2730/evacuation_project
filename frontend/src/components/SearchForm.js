@@ -55,16 +55,7 @@ const prefectures = [
   '沖縄県',
 ];
 
-const disasterTypes = [
-  '洪水',
-  '津波',
-  '地震',
-  '土砂',
-  '高潮',
-  '火山',
-  '火事',
-  '内水',
-];
+const disasterTypes = ['洪水', '津波', '地震', '土砂', '高潮', '火山', '火事', '内水'];
 
 const floodDetailOptions = [
   { label: '通常想定される洪水', value: '計画規模' },
@@ -138,8 +129,7 @@ const SearchForm = ({
         params: {
           pref,
           city,
-          disaster_type:
-            disasterType === '洪水' ? `洪水_${floodDetailType}` : disasterType,
+          disaster_type: disasterType === '洪水' ? `洪水_${floodDetailType}` : disasterType,
           latitude: location.lat,
           longitude: location.lng,
           radius_km: defaultRadius,
@@ -153,8 +143,7 @@ const SearchForm = ({
         onSearchParams({
           pref,
           city,
-          disasterType:
-            disasterType === '洪水' ? `洪水_${floodDetailType}` : disasterType,
+          disasterType: disasterType === '洪水' ? `洪水_${floodDetailType}` : disasterType,
           latitude: location.lat,
           longitude: location.lng,
           radius: defaultRadius,
@@ -186,19 +175,12 @@ const SearchForm = ({
 
       <div>
         <label>市区町村: </label>
-        <input
-          type="text"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-        />
+        <input type="text" value={city} onChange={(e) => setCity(e.target.value)} />
       </div>
 
       <div>
         <label>災害種別: </label>
-        <select
-          value={disasterType}
-          onChange={(e) => setDisasterType(e.target.value)}
-        >
+        <select value={disasterType} onChange={(e) => setDisasterType(e.target.value)}>
           {disasterTypes.map((type) => (
             <option key={type} value={type}>
               {type}
@@ -210,10 +192,7 @@ const SearchForm = ({
       {disasterType === '洪水' && (
         <div>
           <label>洪水の種類: </label>
-          <select
-            value={floodDetailType}
-            onChange={(e) => setFloodDetailType(e.target.value)}
-          >
+          <select value={floodDetailType} onChange={(e) => setFloodDetailType(e.target.value)}>
             {floodDetailOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
@@ -225,10 +204,7 @@ const SearchForm = ({
 
       <div>
         <label>避難所の種別: </label>
-        <select
-          value={shelterType}
-          onChange={(e) => setShelterType(e.target.value)}
-        >
+        <select value={shelterType} onChange={(e) => setShelterType(e.target.value)}>
           {shelterTypeOptions.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}

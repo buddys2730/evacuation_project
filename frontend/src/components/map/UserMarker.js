@@ -13,9 +13,7 @@ const UserMarker = ({ userLocation, radius = 1000 }) => {
     fillOpacity: 0.2,
   };
 
-  return (
-    <Circle center={userLocation} radius={radius} options={circleOptions} />
-  );
+  return <Circle center={userLocation} radius={radius} options={circleOptions} />;
 };
 
 export default UserMarker;

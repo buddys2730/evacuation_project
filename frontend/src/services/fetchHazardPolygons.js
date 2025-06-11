@@ -1,10 +1,5 @@
 // src/utils/fetchHazardPolygons.js
-export async function fetchHazardPolygons(
-  disasterType,
-  latitude,
-  longitude,
-  radiusKm
-) {
+export async function fetchHazardPolygons(disasterType, latitude, longitude, radiusKm) {
   try {
     const params = new URLSearchParams({
       disaster_type: disasterType,
