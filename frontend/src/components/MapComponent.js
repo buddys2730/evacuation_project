@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 // /Users/masashitakao/Desktop/evacuation_project/frontend/src/components/MapComponent.js
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -187,3 +188,7 @@ const MapComponent = ({
 };
 
 export default MapComponent;
+
+MapComponent.propTypes = {
+  // 自動挿入: 必要に応じて手動で編集してください
+};

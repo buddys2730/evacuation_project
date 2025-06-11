@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 // /components/map/HazardPolygonRenderer.js
 import React from 'react';
 import { Polygon } from '@react-google-maps/api';
@@ -27,3 +28,7 @@ const HazardPolygonRenderer = ({ polygons }) => {
 };
 
 export default HazardPolygonRenderer;
+
+HazardPolygonRenderer.propTypes = {
+  // 自動挿入: 必要に応じて手動で編集してください
+};

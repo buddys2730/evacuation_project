@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 // /components/map/UserMarker.js
 import React from 'react';
 import { Circle } from '@react-google-maps/api';
@@ -17,3 +18,7 @@ const UserMarker = ({ userLocation, radius = 1000 }) => {
 };
 
 export default UserMarker;
+
+UserMarker.propTypes = {
+  // 自動挿入: 必要に応じて手動で編集してください
+};

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 // frontend/src/components/ARView.js
 
 import React, { useEffect } from 'react';
@@ -31,3 +32,7 @@ const ARView = () => {
 };
 
 export default ARView;
+
+ARView.propTypes = {
+  // 自動挿入: 必要に応じて手動で編集してください
+};

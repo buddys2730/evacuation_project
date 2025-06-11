@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 // /components/map/RouteRenderer.js
 import React from 'react';
 import { DirectionsRenderer } from '@react-google-maps/api';
@@ -22,3 +23,7 @@ const RouteRenderer = ({ directions }) => {
 };
 
 export default RouteRenderer;
+
+RouteRenderer.propTypes = {
+  // 自動挿入: 必要に応じて手動で編集してください
+};

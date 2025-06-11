@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 // /Users/masashitakao/Desktop/evacuation_project/frontend/src/components/ResultCardList.js
 
 import React from 'react';
@@ -66,3 +67,7 @@ const ResultCardList = ({
 };
 
 export default ResultCardList;
+
+ResultCardList.propTypes = {
+  // 自動挿入: 必要に応じて手動で編集してください
+};
