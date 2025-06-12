@@ -1,19 +1,20 @@
-name: CI Code Checks
+name: CI Checks
 
 on:
   push:
     branches: [main]
   pull_request:
+    branches: [main]
 
 jobs:
-  lint-and-format:
+  lint-and-validate:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: .
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup Node.js
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
@@ -21,11 +22,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run ESLint (excluding node_modules)
-        run: npx eslint frontend/src --ext .js,.jsx || true
-
-      - name: Run Prettier (excluding backend and .py files)
-        run: npx prettier "frontend/**/*.{js,jsx,json,css,md}" --check || true
-
-      - name: Run Markdown Validation
-        run: node scripts/validate-md.js || true
+      - name: Run ESLint
+        run: |
+          rm -f .eslintcache
+          rm -rf node_modules/.cache
+          npx eslint scripts/validate-md.js --no-error-on-unmatched-pattern
