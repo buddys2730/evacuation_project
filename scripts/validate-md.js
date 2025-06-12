@@ -10,7 +10,10 @@ function getAllFiles(dir, fileList = []) {
       if (file === "node_modules" || file.startsWith(".")) return;
       getAllFiles(fullPath, fileList);
     } else {
-      if (file.endsWith(".js") || file.endsWith(".jsx") || file.endsWith(".ts") || file.endsWith(".tsx")) {
+      if (
+        (file.endsWith(".js") || file.endsWith(".jsx") || file.endsWith(".ts") || file.endsWith(".tsx")) &&
+        !fullPath.includes("node_modules")
+      ) {
         fileList.push(fullPath);
       }
     }
