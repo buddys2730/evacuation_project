@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "devDependencies": {
+    "@babel/core": "^7.27.4",
+    "@babel/eslint-parser": "^7.27.5",
     "eslint": "^9.28.0",
     "eslint-plugin-react": "^7.37.5",
     "glob": "^11.0.2",
