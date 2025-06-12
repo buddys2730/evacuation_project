@@ -1,9 +1,10 @@
 export default [
   {
+    files: ["**/*"],
     ignores: [
       "**/node_modules/**",
-      "**/dist/**",
       "**/build/**",
+      "**/dist/**",
       "**/*.min.js"
     ],
   },
