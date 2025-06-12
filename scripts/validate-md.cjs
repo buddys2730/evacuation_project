@@ -18,13 +18,7 @@ function getAllFiles(dir, fileList = []) {
       }
       getAllFiles(fullPath, fileList);
     } else {
-      if (
-        (file.endsWith('.js') ||
-          file.endsWith('.jsx') ||
-          file.endsWith('.ts') ||
-          file.endsWith('.tsx')) &&
-        !fullPath.includes('node_modules')
-      ) {
+      if ((file.endsWith('.js') || file.endsWith('.jsx')) && !fullPath.includes('node_modules')) {
         fileList.push(fullPath);
       }
     }
