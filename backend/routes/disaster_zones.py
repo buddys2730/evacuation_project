@@ -9,6 +9,7 @@ from database import SessionLocal
 
 bp = Blueprint("disaster_zones", __name__)
 
+
 @bp.route("/api/disaster_zones")
 def get_disaster_zones():
     session = SessionLocal()
@@ -21,7 +22,9 @@ def get_disaster_zones():
         point = f"SRID=4326;POINT({lng} {lat})"
 
         query = session.query(DisasterZone).filter(
-            func.ST_DWithin(DisasterZone.geometry, func.ST_GeomFromText(point, 4326), radius)
+            func.ST_DWithin(
+                DisasterZone.geometry, func.ST_GeomFromText(point, 4326), radius
+            )
         )
 
         if disaster_type:
@@ -33,25 +36,21 @@ def get_disaster_zones():
         for zone in results:
             geom = to_shape(zone.geometry)
             coordinates = [[list(coord) for coord in geom.exterior.coords]]
-            features.append({
-                "type": "Feature",
-                "geometry": {
-                    "type": "Polygon",
-                    "coordinates": coordinates
-                },
-                "properties": {
-                    "category": zone.category,
-                    "source": zone.source,
-                    "address": zone.address,
-                    "prefecture": zone.prefecture,
-                    "created_at": zone.created_at.isoformat()
+            features.append(
+                {
+                    "type": "Feature",
+                    "geometry": {"type": "Polygon", "coordinates": coordinates},
+                    "properties": {
+                        "category": zone.category,
+                        "source": zone.source,
+                        "address": zone.address,
+                        "prefecture": zone.prefecture,
+                        "created_at": zone.created_at.isoformat(),
+                    },
                 }
-            })
+            )
 
-        return jsonify({
-            "type": "FeatureCollection",
-            "features": features
-        })
+        return jsonify({"type": "FeatureCollection", "features": features})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:

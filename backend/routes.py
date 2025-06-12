@@ -19,5 +19,5 @@ app.register_blueprint(hazard_zone_service)
 app.register_blueprint(disaster_zone_service)
 app.register_blueprint(hazard_category_bp)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(port=5001, debug=True)

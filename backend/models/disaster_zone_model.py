@@ -5,11 +5,12 @@ from geoalchemy2 import Geometry
 from datetime import datetime
 from database import Base
 
+
 class DisasterZone(Base):
-    __tablename__ = 'disaster_zones'
+    __tablename__ = "disaster_zones"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    geometry = Column(Geometry('POLYGON', srid=4326), nullable=False)
+    geometry = Column(Geometry("POLYGON", srid=4326), nullable=False)
     category = Column(String, nullable=False)
     source = Column(String, nullable=True)
     address = Column(String, nullable=True)
