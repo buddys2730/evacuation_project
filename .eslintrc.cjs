@@ -3,26 +3,23 @@ module.exports = {
   env: {
     browser: true,
     es2021: true,
-    node: true
+    node: true,
   },
-  extends: [
-    "eslint:recommended",
-    "plugin:react/recommended"
-  ],
+  extends: ['eslint:recommended', 'plugin:react/recommended'],
   parserOptions: {
     ecmaVersion: 2021,
-    sourceType: "module",
+    sourceType: 'module',
     ecmaFeatures: {
-      jsx: true
-    }
+      jsx: true,
+    },
   },
-  plugins: ["react"],
+  plugins: ['react'],
   rules: {
-    "react/react-in-jsx-scope": "off"
+    'react/react-in-jsx-scope': 'off',
   },
   settings: {
     react: {
-      version: "detect"
-    }
-  }
+      version: 'detect',
+    },
+  },
 };

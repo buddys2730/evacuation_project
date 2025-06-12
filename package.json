@@ -28,5 +28,6 @@
     "prettier": "^3.5.3",
     "react": "^19.1.0",
     "typescript": "5.8.3"
-  }
+  },
+  "type": "module"
 }
