@@ -1,15 +1,14 @@
 export default [
   {
-    files: ["**/*"],
     ignores: [
-      "**/node_modules/**",
-      "**/build/**",
-      "**/dist/**",
+      "node_modules/**",
+      "build/**",
+      "dist/**",
       "**/*.min.js"
     ],
   },
   {
-    files: ["**/*.js", "**/*.jsx"],
+    files: ["frontend/src/**/*.{js,jsx}"],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
