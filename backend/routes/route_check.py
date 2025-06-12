@@ -1,9 +1,10 @@
 from flask import Blueprint, request, jsonify
 from services.route_checker import check_route_safety
 
-route_check_bp = Blueprint('route_check', __name__)
+route_check_bp = Blueprint("route_check", __name__)
 
-@route_check_bp.route('/api/route-check', methods=['POST'])
+
+@route_check_bp.route("/api/route-check", methods=["POST"])
 def route_check():
     try:
         data = request.get_json()

@@ -14,6 +14,7 @@ route_check_service = Blueprint("route_check_service", __name__)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 load_dotenv(dotenv_path=os.path.join(BASE_DIR, ".env"))
 
+
 @route_check_service.route("/api/route_check", methods=["POST"])
 def route_check():
     try:
@@ -35,7 +36,10 @@ def route_check():
         directions = response.json()
 
         if directions["status"] != "OK":
-            return jsonify({"error": f"Google Maps APIエラー: {directions['status']}"}), 500
+            return (
+                jsonify({"error": f"Google Maps APIエラー: {directions['status']}"}),
+                500,
+            )
 
         conn = get_db_connection()
         cur = conn.cursor()
@@ -53,14 +57,17 @@ def route_check():
 
             is_dangerous = False
             for lng, lat in path_coords:
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT 1 FROM hazard_zones
                     WHERE ST_Intersects(
                         geometry,
                         ST_SetSRID(ST_MakePoint(%s, %s), 4326)
                     )
                     LIMIT 1;
-                """, (lng, lat))
+                """,
+                    (lng, lat),
+                )
                 if cur.fetchone():
                     is_dangerous = True
                     break

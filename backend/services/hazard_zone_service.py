@@ -10,6 +10,7 @@ from backend.database.db_connection import get_db_connection
 hazard_zone_service = Blueprint("hazard_zone_service", __name__)
 hazard_category_bp = Blueprint("hazard_category", __name__)
 
+
 # ✅ 1. 中心点 + 半径に基づく取得
 @hazard_zone_service.route("/api/hazard_zones", methods=["GET"])
 def get_hazard_zones():
@@ -25,7 +26,7 @@ def get_hazard_zones():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        like_pattern = category + '%'
+        like_pattern = category + "%"
 
         query = """
     SELECT id, category, ST_AsGeoJSON(geometry)
@@ -44,11 +45,10 @@ def get_hazard_zones():
         cur.close()
         conn.close()
 
-        results = [{
-            "id": row[0],
-            "category": row[1],
-            "geometry": json.loads(row[2])
-        } for row in rows]
+        results = [
+            {"id": row[0], "category": row[1], "geometry": json.loads(row[2])}
+            for row in rows
+        ]
 
         return jsonify(results)
 
@@ -78,7 +78,7 @@ def get_hazard_zones_in_viewport():
         duration = round((end_time - start_time) * 1000, 2)
         print(f"✅ /api/hazard_zones/viewport: 処理時間 {duration} ms")
 
-        like_pattern = category + '%'
+        like_pattern = category + "%"
         query = """
             SELECT id, category, ST_AsBinary(geometry)
             FROM hazard_zones
@@ -99,20 +99,17 @@ def get_hazard_zones_in_viewport():
             geom = wkb.loads(row[2], hex=False)
             simplified_geom = geom.simplify(0.0001, preserve_topology=True)
             geojson_geom = mapping(simplified_geom)
-            features.append({
-                "type": "Feature",
-                "geometry": geojson_geom,
-                "properties": {
-                    "id": row[0],
-                    "category": row[1]
+            features.append(
+                {
+                    "type": "Feature",
+                    "geometry": geojson_geom,
+                    "properties": {"id": row[0], "category": row[1]},
                 }
-            })
+            )
 
-        return jsonify({
-            "type": "FeatureCollection",
-            "features": features,
-            "duration_ms": duration
-        })
+        return jsonify(
+            {"type": "FeatureCollection", "features": features, "duration_ms": duration}
+        )
 
     except Exception as e:
         print("❌ /api/hazard_zones/viewport エラー:", e)
@@ -135,7 +132,7 @@ def get_main_categories():
         cur.close()
         conn.close()
 
-        categories = [row[0] for row in rows if row[0] != '']
+        categories = [row[0] for row in rows if row[0] != ""]
         return jsonify(categories)
 
     except Exception as e:

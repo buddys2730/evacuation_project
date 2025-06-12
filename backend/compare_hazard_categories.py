@@ -2,7 +2,9 @@ import os
 import psycopg2
 
 # === 設定 ===
-SQL_DATA_DIR = "/Users/masashitakao/Desktop/evacuation_project/database/seed_data/sql_output"
+SQL_DATA_DIR = (
+    "/Users/masashitakao/Desktop/evacuation_project/database/seed_data/sql_output"
+)
 
 DB_CONFIG = {
     "host": "localhost",
@@ -11,6 +13,7 @@ DB_CONFIG = {
     "user": "masashitakao",
     "password": "",  # 必要に応じて入力
 }
+
 
 # === 元データから都道府県×カテゴリを取得 ===
 def get_expected_categories():
@@ -22,11 +25,14 @@ def get_expected_categories():
             expected.setdefault(prefecture, set()).add(category)
     return expected
 
+
 # === DBから都道府県×カテゴリを取得 ===
 def get_registered_categories():
     conn = psycopg2.connect(**DB_CONFIG)
     cur = conn.cursor()
-    cur.execute("SELECT DISTINCT prefecture, category FROM hazard_zones WHERE prefecture IS NOT NULL AND category IS NOT NULL")
+    cur.execute(
+        "SELECT DISTINCT prefecture, category FROM hazard_zones WHERE prefecture IS NOT NULL AND category IS NOT NULL"
+    )
     rows = cur.fetchall()
     conn.close()
 
@@ -34,6 +40,7 @@ def get_registered_categories():
     for prefecture, category in rows:
         registered.setdefault(prefecture, set()).add(category)
     return registered
+
 
 # === 差分チェック ===
 def compare(expected, registered):
@@ -51,6 +58,7 @@ def compare(expected, registered):
                 print(f"❌ DBに存在しないカテゴリ: {sorted(missing)}")
             if extra:
                 print(f"✅ 元データに存在しないカテゴリ（登録済）: {sorted(extra)}")
+
 
 # === 実行 ===
 if __name__ == "__main__":

@@ -12,6 +12,7 @@ search_service = Blueprint("search_service", __name__)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 load_dotenv(dotenv_path=os.path.join(BASE_DIR, ".env"))
 
+
 # DB接続
 def get_db_connection():
     return psycopg2.connect(
@@ -19,8 +20,9 @@ def get_db_connection():
         user=os.getenv("PG_USER"),
         password=os.getenv("PG_PASSWORD"),
         host=os.getenv("PG_HOST"),
-        port=os.getenv("PG_PORT")
+        port=os.getenv("PG_PORT"),
     )
+
 
 # 災害種別とカラムの対応
 DISASTER_COLUMN_MAP = {
@@ -34,6 +36,7 @@ DISASTER_COLUMN_MAP = {
     "火山": "hazard_volcano",
 }
 
+
 @search_service.route("/api/search", methods=["GET"])
 def search():
     try:
@@ -41,7 +44,7 @@ def search():
         pref = request.args.get("pref")
         city = request.args.get("city")
         disaster_type = request.args.get("disaster_type")
-        category = request.args.get('category')  # category=洪水_01_計画規模 など
+        category = request.args.get("category")  # category=洪水_01_計画規模 など
         shelter_type = request.args.get("shelter_type")  # ← 緊急避難所 or 指定避難所
 
         lat_param = request.args.get("latitude")
@@ -56,7 +59,14 @@ def search():
             longitude = float(lng_param)
             radius_km = float(radius_param)
         except ValueError:
-            return jsonify({"error": "latitude, longitude, radius_km は数値である必要があります"}), 400
+            return (
+                jsonify(
+                    {
+                        "error": "latitude, longitude, radius_km は数値である必要があります"
+                    }
+                ),
+                400,
+            )
 
         # テーブル選択
         if shelter_type == "指定避難所":
@@ -69,7 +79,14 @@ def search():
             else:
                 return jsonify({"error": "指定された災害種別は無効です"}), 400
         else:
-            return jsonify({"error": "避難所の種別（緊急避難所 / 指定避難所）を指定してください"}), 400
+            return (
+                jsonify(
+                    {
+                        "error": "避難所の種別（緊急避難所 / 指定避難所）を指定してください"
+                    }
+                ),
+                400,
+            )
 
         # SQLクエリ構築
         if table_name == "designated_shelters":
@@ -127,7 +144,7 @@ def search():
                 "longitude": row[4],
                 "elevation": row[5],
                 "hazard": "不明" if row[6] is None else row[6],
-                "distance_km": round(row[7] / 1000, 2) if row[7] is not None else None
+                "distance_km": round(row[7] / 1000, 2) if row[7] is not None else None,
             }
             for row in rows
         ]

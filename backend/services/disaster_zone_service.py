@@ -7,6 +7,7 @@ from backend.database.db_connection import get_db_connection
 
 disaster_zone_service = Blueprint("disaster_zone_service", __name__)
 
+
 @disaster_zone_service.route("/api/disaster_zones", methods=["GET"])
 def get_disaster_zones():
     try:
@@ -23,7 +24,10 @@ def get_disaster_zones():
             lng = float(lng_param)
             radius = float(radius_param)
         except ValueError:
-            return jsonify({"error": "lat, lng, radius は数値である必要があります"}), 400
+            return (
+                jsonify({"error": "lat, lng, radius は数値である必要があります"}),
+                400,
+            )
 
         point = f"SRID=4326;POINT({lng} {lat})"
 
@@ -40,25 +44,21 @@ def get_disaster_zones():
         for zone in results:
             geom = to_shape(zone.geometry)
             coordinates = [[list(coord) for coord in geom.exterior.coords]]
-            features.append({
-                "type": "Feature",
-                "geometry": {
-                    "type": "Polygon",
-                    "coordinates": coordinates
-                },
-                "properties": {
-                    "category": zone.category,
-                    "source": zone.source,
-                    "address": zone.address,
-                    "prefecture": zone.prefecture,
-                    "created_at": zone.created_at.isoformat()
+            features.append(
+                {
+                    "type": "Feature",
+                    "geometry": {"type": "Polygon", "coordinates": coordinates},
+                    "properties": {
+                        "category": zone.category,
+                        "source": zone.source,
+                        "address": zone.address,
+                        "prefecture": zone.prefecture,
+                        "created_at": zone.created_at.isoformat(),
+                    },
                 }
-            })
+            )
 
-        return jsonify({
-            "type": "FeatureCollection",
-            "features": features
-        })
+        return jsonify({"type": "FeatureCollection", "features": features})
 
     except Exception as e:
         print("❌ /api/disaster_zones 例外:", e)

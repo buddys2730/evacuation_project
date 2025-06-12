@@ -3,6 +3,7 @@
 from database import Base, engine
 from sqlalchemy import inspect
 
+
 def recreate_tables():
     inspector = inspect(engine)
     if "hazard_zones" not in inspector.get_table_names():
@@ -11,6 +12,7 @@ def recreate_tables():
         print("✅ 作成完了")
     else:
         print("✅ hazard_zones テーブルは既に存在しています")
+
 
 if __name__ == "__main__":
     recreate_tables()

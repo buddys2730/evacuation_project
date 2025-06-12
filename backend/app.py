@@ -23,10 +23,12 @@ app.register_blueprint(route_check_bp)
 app.register_blueprint(hazard_zones_bp)
 app.register_blueprint(route_safety_bp)
 
+
 # セッション終了処理
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     db_session.remove()
+
 
 if __name__ == "__main__":
     app.run(port=5001, debug=True)

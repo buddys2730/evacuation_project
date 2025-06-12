@@ -3,6 +3,7 @@ from services.route_safety_service import evaluate_route_safety
 
 route_safety_bp = Blueprint("route_safety", __name__)
 
+
 @route_safety_bp.route("/api/route-safety", methods=["POST"])
 def check_route_safety():
     try:
