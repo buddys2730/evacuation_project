@@ -2,25 +2,35 @@ name: Lint and Validate
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   lint-and-validate:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: ./frontend
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
 
-      - name: Install dependencies
-        run: npm ci
+    - name: Install dependencies
+      run: npm ci
 
-      - name: Lint JS/JSX files
-        run: npx eslint "frontend/src/**/*.{js,jsx}" --max-warnings=0
+    - name: Run ESLint
+      run: npx eslint .
+
+    - name: Run Prettier
+      run: npx prettier --check .
+
+    - name: Run Markdown Validator
+      run: node ../scripts/validate-md.mjs

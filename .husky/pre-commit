@@ -1,9 +1,4 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
 
-. "$(dirname "$0")/_/husky.sh"
-# ✅ 不要な "npm test" 行を pre-commit フックから削除して上書き
-cat <<'EOF' > .husky/pre-commit
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-# ✅ Markdown設計検証 → Lint/Prettier実行
-node scripts/validate-md.cjs && npx lint-staged
+node scripts/validate-md.mjs && npx lint-staged
