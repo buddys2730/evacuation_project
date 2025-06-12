@@ -24,8 +24,8 @@ jobs:
       - name: Run ESLint (excluding node_modules)
         run: npx eslint frontend/src --ext .js,.jsx || true
 
-      - name: Run Prettier (excluding node_modules)
-        run: npx prettier . --check || true
+      - name: Run Prettier (excluding backend and .py files)
+        run: npx prettier "frontend/**/*.{js,jsx,json,css,md}" --check || true
 
       - name: Run Markdown Validation
         run: node scripts/validate-md.js || true
