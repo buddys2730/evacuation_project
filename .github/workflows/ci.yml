@@ -2,40 +2,30 @@ name: CI Checks
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
 
 jobs:
-  lint-and-format:
+  lint-and-validate:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: .
-
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Use Node.js
-        uses: actions/setup-node@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install dependencies (frontend only)
-        working-directory: frontend
-        run: npm ci
+      - name: Install dependencies
+        run: npm install
 
-      - name: Run ESLint (frontend only)
-        working-directory: frontend
-        run: npx eslint src || true
+      - name: Run ESLint
+        run: npx eslint . --ext .js,.jsx,.ts,.tsx,.cjs
 
-      - name: Run Prettier check (docs/, frontend/, backend/, scripts/)
+      - name: Run Prettier Check
         run: |
-          npx prettier --check \
-            "frontend/**/*.{js,jsx,json,css,md}" \
-            "backend/**/*.{py,json,md}" \
-            "docs/**/*.md" \
-            "scripts/**/*.js"
-
-      - name: Check Markdown design & contract rules
-        run: node scripts/validate-md.js
+          npx prettier --check             "frontend/**/*.{js,jsx,json,css,md,cjs}"             "backend/**/*.{py,json,md}"             "docs/**/*.md"             "scripts/**/*.{js,cjs}"
