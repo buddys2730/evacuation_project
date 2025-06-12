@@ -1,7 +1,6 @@
 {
   "name": "evacuation_project",
   "version": "1.0.0",
-  "type": "module",
   "devDependencies": {
     "@babel/core": "^7.27.4",
     "@babel/eslint-parser": "^7.27.5",
