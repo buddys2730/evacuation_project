@@ -1,7 +1,1 @@
-node_modules
-build
-venv
-database/**/*.geojson
-database/**/*.sql
-database/**/*.geojson
-database/**/*.sql
+node_modules/
