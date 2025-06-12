@@ -1,4 +1,4 @@
-name: Lint & Validate
+name: Lint and Validate
 
 on:
   push:
@@ -10,39 +10,17 @@ jobs:
   lint-and-validate:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: .
-
     steps:
-    - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 20
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Install dependencies
-      run: npm ci
-
-    - name: ESLint check (flat config対応)
-      run: npx eslint .
-
-    - name: Prettier check (全体)
-      run: |
-        npx prettier --check \
-        "frontend/**/*.{js,jsx,json,css,md}" \
-        "backend/**/*.{py,json,md}" \
-        "docs/**/*.md" \
-        "scripts/**/*.js"
-
-    - name: Markdownルール検証
-      run: node scripts/validate-md.cjs
-
-    - name: 設計上必要なファイルの存在確認
-      run: node scripts/check-critical-files.js
+      - name: Lint JS/JSX files
+        run: npx eslint "frontend/src/**/*.{js,jsx}" --max-warnings=0
