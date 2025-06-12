@@ -6,7 +6,8 @@
     "lint": "eslint .",
     "prettier": "prettier --write .",
     "update-md-rules": "node scripts/auto-update-md-rules.js",
-    "validate-md": "node scripts/validate-md.js"
+    "validate-md": "node scripts/validate-md.js",
+    "prepare": "husky install"
   },
   "dependencies": {
     "prop-types": "^15.8.1",
@@ -25,9 +26,20 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "glob": "^11.0.2",
+    "husky": "^8.0.0",
+    "lint-staged": "^16.1.0",
     "prettier": "^3.5.3",
     "react": "^19.1.0",
     "typescript": "5.8.3"
   },
-  "type": "module"
+  "type": "module",
+  "lint-staged": {
+    "frontend/**/*.{js,jsx}": [
+      "npx eslint --fix",
+      "npx prettier --write"
+    ],
+    "frontend/**/*.md": [
+      "node scripts/validate-md.cjs"
+    ]
+  }
 }
