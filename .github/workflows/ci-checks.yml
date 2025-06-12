@@ -35,7 +35,6 @@ jobs:
           echo "dist/" >> .prettierignore
           npx prettier --write \
             "frontend/**/*.{js,jsx,json,css,md}" \
-            "backend/**/*.{py,json,md}" \
             "docs/**/*.md" \
             "scripts/**/*.js"
 
