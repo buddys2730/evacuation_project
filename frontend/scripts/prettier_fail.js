@@ -1,2 +1,3 @@
-function x( ){
-return  1}
+function x() {
+  return 1;
+}
