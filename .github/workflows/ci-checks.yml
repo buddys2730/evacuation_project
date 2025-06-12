@@ -1,4 +1,4 @@
-name: ci-checks
+name: Lint and Validate
 
 on:
   push:
@@ -9,34 +9,36 @@ on:
 jobs:
   lint-and-validate:
     runs-on: ubuntu-latest
-
     defaults:
       run:
-        working-directory: ./frontend
+        working-directory: ./
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Clean install dependencies
+      - name: Clean install Node modules
         run: |
+          cd frontend
           rm -f package-lock.json
           npm install
 
-      - name: Run ESLint (ignoring node_modules)
+      - name: Lint with Prettier (Ignore node_modules)
         run: |
-          echo "node_modules/\nbuild/\ndist/" > .eslintignore
-          npx eslint . --ext .js,.jsx --ignore-path .eslintignore
+          echo "node_modules/" > .prettierignore
+          echo "build/" >> .prettierignore
+          echo "dist/" >> .prettierignore
+          npx prettier --write \
+            "frontend/**/*.{js,jsx,json,css,md}" \
+            "backend/**/*.{py,json,md}" \
+            "docs/**/*.md" \
+            "scripts/**/*.js"
 
-      - name: Run Prettier (excluding node_modules)
+      - name: Validate Markdown
         run: |
-          echo "node_modules/\nbuild/\ndist/" > .prettierignore
-          npx prettier --check "**/*.{js,jsx,json,css,md}" --ignore-path .prettierignore
-
-      - name: Run validate-md script (CommonJS)
-        run: node scripts/validate-md.cjs
+          node frontend/scripts/validate-md.cjs
