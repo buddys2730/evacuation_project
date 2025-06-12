@@ -2,28 +2,27 @@ name: CI Checks
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   lint-and-validate:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20'
 
       - name: Install dependencies
         run: npm ci
 
       - name: Run ESLint
-        run: |
-          rm -f .eslintcache
-          rm -rf node_modules/.cache
-          npx eslint scripts/validate-md.js --no-error-on-unmatched-pattern
+        run: npx eslint .
+
+      - name: Run Markdown Validator
+        run: node scripts/validate-md.cjs
