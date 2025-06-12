@@ -1,5 +1,5 @@
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
 function getAllFiles(dir, fileList = []) {
   const files = fs.readdirSync(dir);
@@ -8,19 +8,22 @@ function getAllFiles(dir, fileList = []) {
     const stat = fs.statSync(fullPath);
     if (stat.isDirectory()) {
       if (
-        file === "node_modules" ||
-        file === ".venv" ||
-        file === "venv" ||
-        file === "__pycache__" ||
-        file.startsWith(".")
+        file === 'node_modules' ||
+        file === '.venv' ||
+        file === 'venv' ||
+        file === '__pycache__' ||
+        file.startsWith('.')
       ) {
         return;
       }
       getAllFiles(fullPath, fileList);
     } else {
       if (
-        (file.endsWith(".js") || file.endsWith(".jsx") || file.endsWith(".ts") || file.endsWith(".tsx")) &&
-        !fullPath.includes("node_modules")
+        (file.endsWith('.js') ||
+          file.endsWith('.jsx') ||
+          file.endsWith('.ts') ||
+          file.endsWith('.tsx')) &&
+        !fullPath.includes('node_modules')
       ) {
         fileList.push(fullPath);
       }
@@ -29,13 +32,13 @@ function getAllFiles(dir, fileList = []) {
   return fileList;
 }
 
-const files = getAllFiles("./frontend/src");
+const files = getAllFiles('./frontend/src');
 
 for (const file of files) {
-  const content = fs.readFileSync(file, "utf-8");
-  const lines = content.split("\n");
+  const content = fs.readFileSync(file, 'utf-8');
+  const lines = content.split('\n');
   lines.forEach((line, index) => {
-    if (line.includes("require(") || line.includes("module.exports")) {
+    if (line.includes('require(') || line.includes('module.exports')) {
       console.log(`${file}#L${index + 1}`);
       console.warn(`  Use of CommonJS detected: '${line.trim()}'`);
     }
