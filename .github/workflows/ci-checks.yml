@@ -1,4 +1,4 @@
-name: Lint and Validate
+name: Lint & Validate
 
 on:
   push:
@@ -9,35 +9,40 @@ on:
 jobs:
   lint-and-validate:
     runs-on: ubuntu-latest
+
     defaults:
       run:
-        working-directory: ./
+        working-directory: .
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
 
-      - name: Clean install Node modules
-        run: |
-          cd frontend
-          rm -f package-lock.json
-          npm install
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
 
-      - name: Lint with Prettier (Ignore node_modules)
-        run: |
-          echo "node_modules/" > .prettierignore
-          echo "build/" >> .prettierignore
-          echo "dist/" >> .prettierignore
-          npx prettier --write \
-            "frontend/**/*.{js,jsx,json,css,md}" \
-            "docs/**/*.md" \
-            "scripts/**/*.js"
+    - name: Install dependencies
+      run: npm ci
 
-      - name: Validate Markdown
-        run: |
-          node frontend/scripts/validate-md.cjs
+    - name: ESLint check (frontend only)
+      run: npx eslint . --ignore-path .eslintignore
+
+    - name: Prettier check (all)
+      run: |
+        npx prettier --check \
+        "frontend/**/*.{js,jsx,json,css,md}" \
+        "backend/**/*.{py,json,md}" \
+        "docs/**/*.md" \
+        "scripts/**/*.js"
+
+    - name: Markdown rule check
+      run: node scripts/validate-md.cjs
+
+    - name: Check required critical files
+      run: node scripts/check-critical-files.js
