@@ -4,3 +4,4 @@ dist/
 frontend/scripts/*.js
 # 除外した中で validate-md.cjs は再度含める
 !frontend/scripts/validate-md.cjs
+frontend/test/test-error.js
