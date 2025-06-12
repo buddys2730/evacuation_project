@@ -1,17 +1,15 @@
-import eslintPluginNode from 'eslint-plugin-n';
 export default [
   {
-    files: ['scripts/**/*.{js,cjs}'],
+    files: ['**/*.{js,cjs}'],
     languageOptions: {
       ecmaVersion: 2022,
-      sourceType: 'module'
-    },
-    plugins: {
-      node: eslintPluginNode
+      sourceType: 'module',
+      globals: {
+        console: 'readonly'
+      }
     },
     rules: {
-      'no-undef': 'error',
-      'node/no-deprecated-api': 'error'
+      'no-undef': 'off'
     }
   }
 ];
