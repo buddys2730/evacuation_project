@@ -27,15 +27,15 @@ jobs:
 
       - name: Run ESLint (frontend only)
         working-directory: frontend
-        run: npx eslint src || true
+        run: npx eslint src
 
-      - name: Run Prettier check (docs/, frontend/, backend/, scripts/)
+      - name: Run Prettier check (frontend/src, backend, docs, scripts)
         run: |
           npx prettier --check \
-            "frontend/**/*.{js,jsx,json,css,md}" \
+            "frontend/src/**/*.{js,jsx,json,css,md}" \
             "backend/**/*.{py,json,md}" \
             "docs/**/*.md" \
             "scripts/**/*.js"
 
       - name: Check Markdown design & contract rules
-        run: node scripts/validate-md.js
+        run: node scripts/validate-md.mjs
