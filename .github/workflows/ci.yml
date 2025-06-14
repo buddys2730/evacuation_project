@@ -7,29 +7,27 @@ on:
     branches: [main]
 
 jobs:
-  lint-and-format:
+  lint-and-validate:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: .
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Use Node.js
-        uses: actions/setup-node@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install dependencies (frontend only)
+      - name: Install dependencies
         working-directory: frontend
         run: npm ci
 
-      - name: Run ESLint (frontend only)
+      - name: Run ESLint (frontend/srcのみ)
         working-directory: frontend
-        run: npx eslint src
+        run: npx eslint "src/**/*.{js,jsx,ts,tsx}"
 
-      - name: Run Prettier check (frontend/src, backend, docs, scripts)
+      - name: Run Prettier
         run: |
           npx prettier --check \
             "frontend/src/**/*.{js,jsx,json,css,md}" \
@@ -37,5 +35,5 @@ jobs:
             "docs/**/*.md" \
             "scripts/**/*.js"
 
-      - name: Check Markdown design & contract rules
+      - name: Run Markdown Validator
         run: node scripts/validate-md.mjs
