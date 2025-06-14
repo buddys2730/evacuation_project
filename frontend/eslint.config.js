@@ -9,11 +9,11 @@ export default [
       ecmaVersion: "latest",
       globals: {
         ...globals.browser,
-        ...globals.node
+        ...globals.node,
       },
       parserOptions: {
-        ecmaFeatures: { jsx: true }
-      }
+        ecmaFeatures: { jsx: true },
+      },
     },
     plugins: { react },
     rules: {
@@ -22,10 +22,10 @@ export default [
       "no-undef": "error",
       "no-console": "warn",
       "no-debugger": "warn",
-      "eqeqeq": "error",
+      eqeqeq: "error",
       // React推奨
       "react/jsx-uses-react": "off",
-      "react/react-in-jsx-scope": "off"
-    }
-  }
+      "react/react-in-jsx-scope": "off",
+    },
+  },
 ];
