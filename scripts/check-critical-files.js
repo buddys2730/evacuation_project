@@ -1,9 +1,9 @@
-const fs = require("fs");
+const fs = require('fs');
 const criticalFiles = [
-  "frontend/src/components/MapComponent.js",
-  "frontend/src/pages/ARView.js",
-  "backend/services/search_service.py",
-  "frontend/docs/DATA_FLOW_MAP_V5.md"
+  'frontend/src/components/MapComponent.js',
+  'frontend/src/pages/ARView.js',
+  'backend/services/search_service.py',
+  'frontend/docs/DATA_FLOW_MAP_V5.md',
 ];
 
 let allExist = true;

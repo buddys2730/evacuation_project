@@ -29,7 +29,7 @@ jobs:
         run: npm ci
 
       - name: Run ESLint
-        run: npx eslint .
+        run: npx eslint . --ignore-pattern node_modules/
 
       - name: Run Prettier check
         run: npx prettier --check .
