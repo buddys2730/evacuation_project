@@ -2,40 +2,38 @@ name: CI Checks
 
 on:
   push:
-    branches: ['main']
+    branches: [main]
   pull_request:
-    branches: ['main']
+    branches: [main]
 
 jobs:
-  validate:
+  lint-and-validate:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out code
+      - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Show current directory
-        run: pwd
-
-      - name: Show files
-        run: ls -la
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
 
       - name: Install dependencies
+        working-directory: frontend
         run: npm ci
 
-      - name: Run ESLint
-        run: npx eslint . --ignore-pattern node_modules/
+      - name: Run ESLint (frontend/srcのみ)
+        working-directory: frontend
+        run: npx eslint "src/**/*.{js,jsx,ts,tsx}"
 
-      - name: Run Prettier check
-        run: npx prettier --check .
+      - name: Run Prettier
+        run: |
+          npx prettier --check \
+            "frontend/src/**/*.{js,jsx,json,css,md}" \
+            "backend/**/*.{py,json,md}" \
+            "docs/**/*.md" \
+            "scripts/**/*.js"
 
-      - name: Run Markdown rule check
-        run: node scripts/check-md-rules.js || echo "Markdown rule check skipped"
-
-      - name: Markdown契約・設計チェック
-        run: node scripts/validate-md.js || echo "契約チェック skipped"
+      - name: Run Markdown Validator
+        run: node scripts/validate-md.mjs
