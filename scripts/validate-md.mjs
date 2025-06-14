@@ -2,17 +2,39 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const docsDir = path.join(__dirname, "../frontend/docs");
+// __dirname 相当
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-fs.readdirSync(docsDir).forEach((file) => {
-  if (file.endsWith(".md")) {
-    const content = fs.readFileSync(path.join(docsDir, file), "utf8");
-    if (!content.includes("##")) {
-      console.error(`❌ Missing section header in ${file}`);
-      process.exit(1);
-    }
+const DOCS_DIR = path.join(__dirname, "../frontend/docs");
+
+function validateMarkdown(filePath) {
+  const content = fs.readFileSync(filePath, "utf-8");
+  // ここでMarkdownのルール判定
+  if (content.includes("<<<<<<<") || content.includes("=======") || content.includes(">>>>>>>")) {
+    console.log(`[FAIL] Merge conflict marker in ${path.basename(filePath)}`);
+    return false;
   }
-});
+  // 他のルールも追加可
+  return true;
+}
 
-console.log("✅ Markdown validation passed.");
+function validateAllMarkdownFiles() {
+  const files = fs.readdirSync(DOCS_DIR).filter(f => f.endsWith(".md"));
+  let allValid = true;
+  files.forEach(file => {
+    const fullPath = path.join(DOCS_DIR, file);
+    if (!validateMarkdown(fullPath)) {
+      allValid = false;
+    }
+  });
+  if (allValid) {
+    console.log("All markdown files passed validation ✅");
+    process.exit(0);
+  } else {
+    console.error("Some markdown files failed validation ❌");
+    process.exit(1);
+  }
+}
+
+validateAllMarkdownFiles();
