@@ -1,16 +1,21 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 // frontend/src/components/ARView.js
 
-import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 const ARView = () => {
   const location = useLocation();
   const evacData = location.state;
 
   useEffect(() => {
-    if (!evacData || !evacData.latitude || !evacData.longitude || !evacData.name) {
-      alert('避難所データが不足しています。');
+    if (
+      !evacData ||
+      !evacData.latitude ||
+      !evacData.longitude ||
+      !evacData.name
+    ) {
+      alert("避難所データが不足しています。");
       return;
     }
 

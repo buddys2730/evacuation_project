@@ -1,7 +1,7 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 // /components/map/HazardPolygonRenderer.js
-import React from 'react';
-import { Polygon } from '@react-google-maps/api';
+import React from "react";
+import { Polygon } from "@react-google-maps/api";
 
 const HazardPolygonRenderer = ({ polygons }) => {
   if (!polygons || !Array.isArray(polygons)) return null;
@@ -13,9 +13,9 @@ const HazardPolygonRenderer = ({ polygons }) => {
           key={index}
           paths={polygonCoords}
           options={{
-            fillColor: '#FF0000',
+            fillColor: "#FF0000",
             fillOpacity: 0.3,
-            strokeColor: '#FF0000',
+            strokeColor: "#FF0000",
             strokeOpacity: 0.8,
             strokeWeight: 2,
             clickable: false,

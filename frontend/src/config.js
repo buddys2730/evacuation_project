@@ -4,7 +4,7 @@ const config = {
 };
 
 if (!config.API_BASE_URL) {
-  console.error('❌ REACT_APP_API_BASE_URL が設定されていません。');
+  console.error("❌ REACT_APP_API_BASE_URL が設定されていません。");
 }
 
 export default config;

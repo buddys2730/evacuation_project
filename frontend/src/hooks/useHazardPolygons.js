@@ -1,6 +1,6 @@
 // /src/hooks/useHazardPolygons.js
-import { useEffect, useState } from 'react';
-import { fetchHazardPolygons } from '../services/fetchHazardPolygons.js'; // ✅ 修正
+import { useEffect, useState } from "react";
+import { fetchHazardPolygons } from "../services/fetchHazardPolygons.js"; // ✅ 修正
 
 const useHazardPolygons = (disasterType, userLocation, radiusKm, trigger) => {
   const [hazardPolygons, setHazardPolygons] = useState([]);
@@ -13,7 +13,7 @@ const useHazardPolygons = (disasterType, userLocation, radiusKm, trigger) => {
         disasterType,
         userLocation.lat,
         userLocation.lng,
-        radiusKm
+        radiusKm,
       );
       setHazardPolygons(polygons);
     };

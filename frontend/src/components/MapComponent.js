@@ -1,7 +1,7 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 // /Users/masashitakao/Desktop/evacuation_project/frontend/src/components/MapComponent.js
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 import {
   GoogleMap,
   LoadScript,
@@ -10,8 +10,8 @@ import {
   Circle,
   DirectionsRenderer,
   Polygon,
-} from '@react-google-maps/api';
-import { fetchHazardPolygons } from '../services/fetchHazardPolygons'; // ✅ services配下から読み込み
+} from "@react-google-maps/api";
+import { fetchHazardPolygons } from "../services/fetchHazardPolygons"; // ✅ services配下から読み込み
 
 const MapComponent = ({
   results = [],
@@ -30,7 +30,7 @@ const MapComponent = ({
   const defaultCenter = userLocation || { lat: 35.681236, lng: 139.767125 };
 
   useEffect(() => {
-    if (hazardDisplayMode === 'hazard' && userLocation) {
+    if (hazardDisplayMode === "hazard" && userLocation) {
       loadHazardPolygons();
     } else {
       setHazardPolygons([]);
@@ -43,11 +43,11 @@ const MapComponent = ({
         selectedCategories,
         userLocation.lat,
         userLocation.lng,
-        radiusKm
+        radiusKm,
       );
       setHazardPolygons(fetched);
     } catch (err) {
-      console.error('ポリゴン取得エラー:', err);
+      console.error("ポリゴン取得エラー:", err);
       setHazardPolygons([]);
     }
   };
@@ -56,11 +56,13 @@ const MapComponent = ({
     hazardPolygons.map((poly, idx) => (
       <Polygon
         key={idx}
-        paths={poly.coordinates.map((ring) => ring.map(([lng, lat]) => ({ lat, lng })))}
+        paths={poly.coordinates.map((ring) =>
+          ring.map(([lng, lat]) => ({ lat, lng })),
+        )}
         options={{
-          fillColor: '#ff0000',
+          fillColor: "#ff0000",
           fillOpacity: 0.3,
-          strokeColor: '#ff0000',
+          strokeColor: "#ff0000",
           strokeWeight: 1,
         }}
       />
@@ -69,7 +71,7 @@ const MapComponent = ({
   return (
     <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
       <GoogleMap
-        mapContainerStyle={{ height: '500px', width: '100%' }}
+        mapContainerStyle={{ height: "500px", width: "100%" }}
         center={defaultCenter}
         zoom={14}
         onLoad={(map) => {
@@ -79,7 +81,7 @@ const MapComponent = ({
               setUserLocation({
                 lat: pos.coords.latitude,
                 lng: pos.coords.longitude,
-              })
+              }),
             );
           }
         }}
@@ -92,8 +94,8 @@ const MapComponent = ({
               center={userLocation}
               radius={radiusKm * 1000}
               options={{
-                fillColor: '#2196f3',
-                strokeColor: '#0d47a1',
+                fillColor: "#2196f3",
+                strokeColor: "#0d47a1",
                 fillOpacity: 0.1,
               }}
             />
@@ -131,48 +133,50 @@ const MapComponent = ({
         {directions && (
           <button
             style={{
-              position: 'absolute',
-              top: '10px',
-              left: '10px',
+              position: "absolute",
+              top: "10px",
+              left: "10px",
               zIndex: 10,
-              padding: '8px 12px',
-              backgroundColor: '#1976d2',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '4px',
+              padding: "8px 12px",
+              backgroundColor: "#1976d2",
+              color: "#fff",
+              border: "none",
+              borderRadius: "4px",
             }}
             onClick={async () => {
-              const routePoints = directions.routes[0].overview_path.map((point) => ({
-                lat: point.lat(),
-                lng: point.lng(),
-              }));
+              const routePoints = directions.routes[0].overview_path.map(
+                (point) => ({
+                  lat: point.lat(),
+                  lng: point.lng(),
+                }),
+              );
 
               try {
                 const response = await fetch(
                   `${process.env.REACT_APP_API_BASE_URL}/api/route-safety`,
                   {
-                    method: 'POST',
+                    method: "POST",
                     headers: {
-                      'Content-Type': 'application/json',
+                      "Content-Type": "application/json",
                     },
                     body: JSON.stringify({ route: routePoints }),
-                  }
+                  },
                 );
 
                 const data = await response.json();
-                if (data.status === 'success') {
-                  if (data.result.status === 'danger') {
-                    alert('⚠️ 危険な地点が含まれています！');
-                    console.warn('危険ポイント:', data.result.dangerous_points);
+                if (data.status === "success") {
+                  if (data.result.status === "danger") {
+                    alert("⚠️ 危険な地点が含まれています！");
+                    console.warn("危険ポイント:", data.result.dangerous_points);
                   } else {
-                    alert('✅ このルートは安全です。');
+                    alert("✅ このルートは安全です。");
                   }
                 } else {
-                  alert('⚠️ 判定エラー: ' + data.message);
+                  alert("⚠️ 判定エラー: " + data.message);
                 }
               } catch (err) {
-                console.error('❌ APIエラー:', err);
-                alert('❌ 通信に失敗しました');
+                console.error("❌ APIエラー:", err);
+                alert("❌ 通信に失敗しました");
               }
             }}
           >
@@ -181,7 +185,7 @@ const MapComponent = ({
         )}
 
         {/* ハザードポリゴン */}
-        {hazardDisplayMode === 'hazard' && renderPolygons()}
+        {hazardDisplayMode === "hazard" && renderPolygons()}
       </GoogleMap>
     </LoadScript>
   );
