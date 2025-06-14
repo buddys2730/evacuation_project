@@ -1,7 +1,7 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 // /components/map/SearchResultMarkers.js
-import React, { useState } from 'react';
-import { Marker, InfoWindow } from '@react-google-maps/api';
+import React, { useState } from "react";
+import { Marker, InfoWindow } from "@react-google-maps/api";
 
 const SearchResultMarkers = ({ results, selectedPoint, setSelectedPoint }) => {
   const [activeInfoWindowIndex, setActiveInfoWindowIndex] = useState(null);
@@ -31,8 +31,8 @@ const SearchResultMarkers = ({ results, selectedPoint, setSelectedPoint }) => {
                 <div>
                   <h3>{point.name}</h3>
                   <p>{point.address}</p>
-                  <p>混雑度: {point.congestion ?? '不明'}</p>
-                  <p>必要物資: {point.supplies ?? '不明'}</p>
+                  <p>混雑度: {point.congestion ?? "不明"}</p>
+                  <p>必要物資: {point.supplies ?? "不明"}</p>
                 </div>
               </InfoWindow>
             )}

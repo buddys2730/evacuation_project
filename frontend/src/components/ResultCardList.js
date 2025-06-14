@@ -1,7 +1,7 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 // /Users/masashitakao/Desktop/evacuation_project/frontend/src/components/ResultCardList.js
 
-import React from 'react';
+import React from "react";
 
 const ResultCardList = ({
   results = [],
@@ -14,7 +14,7 @@ const ResultCardList = ({
     setSelectedPoint(point);
 
     if (!userLocation) {
-      alert('現在地が取得できていません。');
+      alert("現在地が取得できていません。");
       return;
     }
 
@@ -29,15 +29,15 @@ const ResultCardList = ({
         if (status === window.google.maps.DirectionsStatus.OK) {
           setDirections(result);
         } else {
-          console.error('ルート取得失敗:', status);
-          alert('ルートを取得できませんでした。');
+          console.error("ルート取得失敗:", status);
+          alert("ルートを取得できませんでした。");
         }
-      }
+      },
     );
   };
 
   return (
-    <div style={{ marginTop: '20px' }}>
+    <div style={{ marginTop: "20px" }}>
       <h3>検索結果一覧</h3>
       {results.length === 0 ? (
         <p>検索結果がありません。</p>
@@ -48,16 +48,21 @@ const ResultCardList = ({
               key={idx}
               onClick={() => handleCardClick(point)}
               style={{
-                border: selectedPoint?.id === point.id ? '2px solid red' : '1px solid #ccc',
-                padding: '10px',
-                marginBottom: '10px',
-                cursor: 'pointer',
-                background: selectedPoint?.id === point.id ? '#ffecec' : '#fff',
+                border:
+                  selectedPoint?.id === point.id
+                    ? "2px solid red"
+                    : "1px solid #ccc",
+                padding: "10px",
+                marginBottom: "10px",
+                cursor: "pointer",
+                background: selectedPoint?.id === point.id ? "#ffecec" : "#fff",
               }}
             >
               <h4>{point.name}</h4>
               <p>{point.address}</p>
-              {userLocation && point.distance && <p>距離: {point.distance.toFixed(2)} km</p>}
+              {userLocation && point.distance && (
+                <p>距離: {point.distance.toFixed(2)} km</p>
+              )}
             </div>
           ))}
         </div>

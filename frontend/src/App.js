@@ -1,9 +1,9 @@
 // /Users/masashitakao/Desktop/evacuation_project/frontend/src/App.js
 
-import React, { useState } from 'react';
-import SearchForm from './components/SearchForm';
-import MapComponent from './components/MapComponent';
-import ResultCardList from './components/ResultCardList';
+import React, { useState } from "react";
+import SearchForm from "./components/SearchForm";
+import MapComponent from "./components/MapComponent";
+import ResultCardList from "./components/ResultCardList";
 
 function App() {
   const [results, setResults] = useState([]);
@@ -12,8 +12,10 @@ function App() {
   const [route, setRoute] = useState(null);
   const [userLocation, setUserLocation] = useState(null); // ✅ 追加
   const [radiusKm, setRadiusKm] = useState(3);
-  const [hazardDisplayMode, setHazardDisplayMode] = useState('off');
-  const [selectedCategories, setSelectedCategories] = useState(['洪水_01_計画規模']);
+  const [hazardDisplayMode, setHazardDisplayMode] = useState("off");
+  const [selectedCategories, setSelectedCategories] = useState([
+    "洪水_01_計画規模",
+  ]);
 
   const handleResults = (data) => {
     setResults(data);
@@ -47,14 +49,17 @@ function App() {
     };
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/route_check`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ origin, destination }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/api/route_check`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ origin, destination }),
+        },
+      );
 
       const data = await response.json();
-      const isSafe = data.status === 'safe';
+      const isSafe = data.status === "safe";
 
       setRoute({
         latitude: origin.lat,
@@ -64,7 +69,7 @@ function App() {
         isSafe,
       });
     } catch (error) {
-      console.error('❌ 安全ルートAPI通信失敗:', error);
+      console.error("❌ 安全ルートAPI通信失敗:", error);
       setRoute({
         latitude: origin.lat,
         longitude: origin.lng,
@@ -76,28 +81,33 @@ function App() {
   };
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
       <h2>避難所検索システム</h2>
 
-      <div style={{ marginBottom: '1rem' }}>
+      <div style={{ marginBottom: "1rem" }}>
         <label>表示切替: </label>
-        <select value={hazardDisplayMode} onChange={(e) => setHazardDisplayMode(e.target.value)}>
+        <select
+          value={hazardDisplayMode}
+          onChange={(e) => setHazardDisplayMode(e.target.value)}
+        >
           <option value="off">表示なし</option>
           <option value="hazard">ハザードマップ表示</option>
           <option value="disaster">現在の災害情報</option>
         </select>
       </div>
 
-      <div style={{ marginBottom: '1rem' }}>
+      <div style={{ marginBottom: "1rem" }}>
         <label>表示カテゴリ（複数選択可）:</label>
         <br />
         <select
           multiple
           value={selectedCategories}
           onChange={(e) =>
-            setSelectedCategories(Array.from(e.target.selectedOptions, (option) => option.value))
+            setSelectedCategories(
+              Array.from(e.target.selectedOptions, (option) => option.value),
+            )
           }
-          style={{ width: '100%', height: '100px' }}
+          style={{ width: "100%", height: "100px" }}
         >
           <option value="洪水_01_計画規模">洪水_01_計画規模</option>
           <option value="洪水_02_想定最大規模">洪水_02_想定最大規模</option>
