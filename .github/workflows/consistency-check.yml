@@ -1,0 +1,31 @@
+name: Consistency Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  diff-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compare approved specs/designs to current files
+        run: |
+          diff -ru docs/approved/ docs/ > diff_report.txt || true
+          if grep -qvE "Only in docs/approved|Only in docs/" diff_report.txt; then
+            echo "❌ 合意済み設計・仕様・DB定義との差分が存在します。マージ不可。"
+            cat diff_report.txt
+            exit 1
+          else
+            echo "✅ 合意リストとの差分なし"
+          fi
+
+      - name: Archive diff report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diff-report
+          path: diff_report.txt
