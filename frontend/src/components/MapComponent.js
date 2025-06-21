@@ -32,37 +32,58 @@ const MapComponent = ({
 
   // DBからhazardPolygonsをAPI経由で自動取得
   useEffect(() => {
-  console.log("useEffect発火:", hazardDisplayMode, center, selectedCategories, radiusKm);
-  console.log("searchParamsの中身:", searchParams);
-  console.log("fetchHazardPolygons呼び出し値 lat:", center.lat, "lng:", center.lng);
-  console.log("useEffect発火:", hazardDisplayMode, center, selectedCategories, radiusKm);
-  let isMounted = true;
-  const loadHazardPolygons = async () => {
-    if (hazardDisplayMode === "hazard" && center && selectedCategories.length > 0) {
-      console.log("ハザードポリゴン取得APIリクエスト実行");
-      try {
-        // ここを修正！（prefecture名を正しく渡す）
-const fetched = await fetchHazardPolygons(
-  selectedCategories,
-  center.lat,
-  center.lng,
-  radiusKm,
-  searchParams?.prefecture || searchParams?.pref // どちらか値がある方を使う
-);
+    console.log(
+      "useEffect発火:",
+      hazardDisplayMode,
+      center,
+      selectedCategories,
+      radiusKm,
+    );
+    console.log("searchParamsの中身:", searchParams);
+    console.log(
+      "fetchHazardPolygons呼び出し値 lat:",
+      center.lat,
+      "lng:",
+      center.lng,
+    );
+    console.log(
+      "useEffect発火:",
+      hazardDisplayMode,
+      center,
+      selectedCategories,
+      radiusKm,
+    );
+    let isMounted = true;
+    const loadHazardPolygons = async () => {
+      if (
+        hazardDisplayMode === "hazard" &&
+        center &&
+        selectedCategories.length > 0
+      ) {
+        console.log("ハザードポリゴン取得APIリクエスト実行");
+        try {
+          // ここを修正！（prefecture名を正しく渡す）
+          const fetched = await fetchHazardPolygons(
+            selectedCategories,
+            center.lat,
+            center.lng,
+            radiusKm,
+            searchParams?.prefecture || searchParams?.pref, // どちらか値がある方を使う
+          );
 
-
-        if (isMounted) setHazardPolygons(fetched);
-      } catch (err) {
+          if (isMounted) setHazardPolygons(fetched);
+        } catch (err) {
+          setHazardPolygons([]);
+        }
+      } else {
         setHazardPolygons([]);
       }
-    } else {
-      setHazardPolygons([]);
-    }
-  };
-  loadHazardPolygons();
-  return () => { isMounted = false; };
-}, [hazardDisplayMode, center.lat, center.lng, selectedCategories, radiusKm]);
-
+    };
+    loadHazardPolygons();
+    return () => {
+      isMounted = false;
+    };
+  }, [hazardDisplayMode, center.lat, center.lng, selectedCategories, radiusKm]);
 
   return (
     <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
@@ -117,7 +138,7 @@ const fetched = await fetchHazardPolygons(
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ route: routePoints }),
-                  }
+                  },
                 );
                 const data = await response.json();
                 if (data.status === "success") {
@@ -139,8 +160,8 @@ const fetched = await fetchHazardPolygons(
         )}
         {hazardDisplayMode === "hazard" && (
           <>
-           {console.log("MapComponentで受け取った polygons =", hazardPolygons)}
-           <HazardPolygonRenderer polygons={hazardPolygons} />
+            {console.log("MapComponentで受け取った polygons =", hazardPolygons)}
+            <HazardPolygonRenderer polygons={hazardPolygons} />
           </>
         )}
       </GoogleMap>
