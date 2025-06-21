@@ -1,136 +1,96 @@
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import PropTypes from "prop-types";
-// /Users/masashitakao/Desktop/evacuation_project/frontend/src/components/MapComponent.js
-
-import React, { useEffect, useRef, useState } from "react";
-import {
-  GoogleMap,
-  LoadScript,
-  Marker,
-  InfoWindow,
-  Circle,
-  DirectionsRenderer,
-  Polygon,
-} from "@react-google-maps/api";
-import { fetchHazardPolygons } from "../services/fetchHazardPolygons"; // ✅ services配下から読み込み
+import { GoogleMap, LoadScript, Circle } from "@react-google-maps/api";
+import UserMarker from "./map/UserMarker.js";
+import SearchResultMarkers from "./map/SearchResultMarkers.js";
+import RouteRenderer from "./map/RouteRenderer.js";
+import HazardPolygonRenderer from "./map/HazardPolygonRenderer.js";
+import { fetchHazardPolygons } from "../services/fetchHazardPolygons.js";
 
 const MapComponent = ({
-  results = [],
-  userLocation,
-  setUserLocation,
-  selectedPoint,
-  setSelectedPoint,
-  directions,
+  points,
+  selectedId,
+  onSelectPoint,
+  route,
+  radiusKm,
+  setRadiusKm,
+  setRoute,
   hazardDisplayMode,
-  selectedCategories = [],
-  radiusKm = 3,
+  searchParams,
+  selectedCategories,
+  userLocation,
 }) => {
   const mapRef = useRef(null);
   const [hazardPolygons, setHazardPolygons] = useState([]);
 
-  const defaultCenter = userLocation || { lat: 35.681236, lng: 139.767125 };
+  // マップ中心座標
+  const center = useMemo(() => {
+    if (searchParams && searchParams.center) return searchParams.center;
+    if (userLocation) return userLocation;
+    return { lat: 35.681236, lng: 139.767125 };
+  }, [searchParams, userLocation]);
 
+  // DBからhazardPolygonsをAPI経由で自動取得
   useEffect(() => {
-    if (hazardDisplayMode === "hazard" && userLocation) {
-      loadHazardPolygons();
+  console.log("useEffect発火:", hazardDisplayMode, center, selectedCategories, radiusKm);
+  console.log("searchParamsの中身:", searchParams);
+  console.log("fetchHazardPolygons呼び出し値 lat:", center.lat, "lng:", center.lng);
+  console.log("useEffect発火:", hazardDisplayMode, center, selectedCategories, radiusKm);
+  let isMounted = true;
+  const loadHazardPolygons = async () => {
+    if (hazardDisplayMode === "hazard" && center && selectedCategories.length > 0) {
+      console.log("ハザードポリゴン取得APIリクエスト実行");
+      try {
+        // ここを修正！（prefecture名を正しく渡す）
+const fetched = await fetchHazardPolygons(
+  selectedCategories,
+  center.lat,
+  center.lng,
+  radiusKm,
+  searchParams?.prefecture || searchParams?.pref // どちらか値がある方を使う
+);
+
+
+        if (isMounted) setHazardPolygons(fetched);
+      } catch (err) {
+        setHazardPolygons([]);
+      }
     } else {
       setHazardPolygons([]);
     }
-  }, [hazardDisplayMode, userLocation, selectedCategories]);
-
-  const loadHazardPolygons = async () => {
-    try {
-      const fetched = await fetchHazardPolygons(
-        selectedCategories,
-        userLocation.lat,
-        userLocation.lng,
-        radiusKm,
-      );
-      setHazardPolygons(fetched);
-    } catch (err) {
-      console.error("ポリゴン取得エラー:", err);
-      setHazardPolygons([]);
-    }
   };
+  loadHazardPolygons();
+  return () => { isMounted = false; };
+}, [hazardDisplayMode, center.lat, center.lng, selectedCategories, radiusKm]);
 
-  const renderPolygons = () =>
-    hazardPolygons.map((poly, idx) => (
-      <Polygon
-        key={idx}
-        paths={poly.coordinates.map((ring) =>
-          ring.map(([lng, lat]) => ({ lat, lng })),
-        )}
-        options={{
-          fillColor: "#ff0000",
-          fillOpacity: 0.3,
-          strokeColor: "#ff0000",
-          strokeWeight: 1,
-        }}
-      />
-    ));
 
   return (
     <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
       <GoogleMap
         mapContainerStyle={{ height: "500px", width: "100%" }}
-        center={defaultCenter}
+        center={center}
         zoom={14}
         onLoad={(map) => {
           mapRef.current = map;
-          if (!userLocation && navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((pos) =>
-              setUserLocation({
-                lat: pos.coords.latitude,
-                lng: pos.coords.longitude,
-              }),
-            );
-          }
         }}
       >
-        {/* 現在地 */}
-        {userLocation && (
-          <>
-            <Marker position={userLocation} label="現在地" />
-            <Circle
-              center={userLocation}
-              radius={radiusKm * 1000}
-              options={{
-                fillColor: "#2196f3",
-                strokeColor: "#0d47a1",
-                fillOpacity: 0.1,
-              }}
-            />
-          </>
-        )}
-
-        {/* 検索結果マーカー */}
-        {results.map((point, index) => (
-          <Marker
-            key={index}
-            position={{ lat: point.latitude, lng: point.longitude }}
-            onClick={() => setSelectedPoint(point)}
-          />
-        ))}
-
-        {/* 吹き出し */}
-        {selectedPoint && (
-          <InfoWindow
-            position={{
-              lat: selectedPoint.latitude,
-              lng: selectedPoint.longitude,
-            }}
-            onCloseClick={() => setSelectedPoint(null)}
-          >
-            <div>
-              <h3>{selectedPoint.name}</h3>
-              <p>{selectedPoint.address}</p>
-            </div>
-          </InfoWindow>
-        )}
-
-        {/* ルート案内 */}
-        {directions && <DirectionsRenderer directions={directions} />}
-        {/* ルートの安全性チェックボタン */}
-        {directions && (
+        <UserMarker position={center} />
+        <Circle
+          center={center}
+          radius={radiusKm * 1000}
+          options={{
+            fillColor: "#2196f3",
+            strokeColor: "#0d47a1",
+            fillOpacity: 0.1,
+          }}
+        />
+        <SearchResultMarkers
+          points={points}
+          selectedId={selectedId}
+          onSelect={onSelectPoint}
+        />
+        <RouteRenderer route={route} />
+        {route && (
           <button
             style={{
               position: "absolute",
@@ -144,30 +104,25 @@ const MapComponent = ({
               borderRadius: "4px",
             }}
             onClick={async () => {
-              const routePoints = directions.routes[0].overview_path.map(
-                (point) => ({
-                  lat: point.lat(),
-                  lng: point.lng(),
-                }),
-              );
+              const routePoints =
+                route.routes?.[0]?.overview_path?.map((pt) => ({
+                  lat: pt.lat(),
+                  lng: pt.lng(),
+                })) || [];
 
               try {
                 const response = await fetch(
                   `${process.env.REACT_APP_API_BASE_URL}/api/route-safety`,
                   {
                     method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ route: routePoints }),
-                  },
+                  }
                 );
-
                 const data = await response.json();
                 if (data.status === "success") {
                   if (data.result.status === "danger") {
                     alert("⚠️ 危険な地点が含まれています！");
-                    console.warn("危険ポイント:", data.result.dangerous_points);
                   } else {
                     alert("✅ このルートは安全です。");
                   }
@@ -175,7 +130,6 @@ const MapComponent = ({
                   alert("⚠️ 判定エラー: " + data.message);
                 }
               } catch (err) {
-                console.error("❌ APIエラー:", err);
                 alert("❌ 通信に失敗しました");
               }
             }}
@@ -183,16 +137,29 @@ const MapComponent = ({
             このルートの安全性をチェック
           </button>
         )}
-
-        {/* ハザードポリゴン */}
-        {hazardDisplayMode === "hazard" && renderPolygons()}
+        {hazardDisplayMode === "hazard" && (
+          <>
+           {console.log("MapComponentで受け取った polygons =", hazardPolygons)}
+           <HazardPolygonRenderer polygons={hazardPolygons} />
+          </>
+        )}
       </GoogleMap>
     </LoadScript>
   );
 };
 
-export default MapComponent;
-
 MapComponent.propTypes = {
-  // 自動挿入: 必要に応じて手動で編集してください
+  points: PropTypes.array.isRequired,
+  selectedId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  onSelectPoint: PropTypes.func.isRequired,
+  route: PropTypes.object,
+  radiusKm: PropTypes.number.isRequired,
+  setRadiusKm: PropTypes.func.isRequired,
+  setRoute: PropTypes.func.isRequired,
+  hazardDisplayMode: PropTypes.string.isRequired,
+  searchParams: PropTypes.object,
+  selectedCategories: PropTypes.array.isRequired,
+  userLocation: PropTypes.object,
 };
+
+export default MapComponent;
