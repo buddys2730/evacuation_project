@@ -1,11 +1,24 @@
 {
   "name": "evacuation_project",
   "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@react-google-maps/api": "^2.19.1",
+    "axios": "^1.10.0",
+    "dayjs": "^1.11.13",
+    "prop-types": "^15.8.1",
+    "rc-slider": "^11.1.8",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^7.6.2",
+    "react-scripts": "5.0.1"
+  },
   "devDependencies": {
     "@babel/core": "^7.27.4",
     "@babel/eslint-parser": "^7.27.5",
     "@eslint/js": "^9.29.0",
-    "eslint": "^9.28.0",
+    "eslint": "^9.29.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-react": "^7.37.5",
     "glob": "^11.0.2",
@@ -15,7 +28,22 @@
     "prettier": "^3.5.3"
   },
   "scripts": {
-    "prepare": "if [ -d .git ]; then npx husky install; else echo 'CI環境のためhuskyをスキップ'; fi"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "prepare": "if [ -d .git ]; then npx husky install; else echo 'CI環境のためhuskyをスキップ'; fi",
+    "check:mapcomponent": "node scripts/check-mapcomponent-design.js",
+    "check:usermarker": "node scripts/check-usermarker-design.js",
+    "check:routerenderer": "node scripts/check-routerenderer-design.js",
+    "check:searchresultmarkers": "node scripts/check-searchresultmarkers-design.js",
+    "check:hazardpolygonrenderer": "node scripts/check-hazardpolygonrenderer-design.js",
+    "check:resultcardlist": "node scripts/check-resultcardlist-design.js",
+    "check:searchform": "node scripts/check-searchform-design.js",
+    "check:shelterdetail": "node scripts/check-shelterdetail-design.js",
+    "check:crowdstatus": "node scripts/check-crowdstatus-design.js",
+    "check:sheltersupplies": "node scripts/check-sheltersupplies-design.js",
+    "check:shelterreview": "node scripts/check-shelterreview-design.js"
   },
   "lint-staged": {
     "src/**/*.{js,jsx}": [
@@ -23,8 +51,16 @@
       "prettier --write"
     ]
   },
-  "dependencies": {
-    "prop-types": "^15.8.1"
-  },
-  "type": "module"
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }

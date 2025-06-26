@@ -1,57 +1,48 @@
-# /Users/masashitakao/Desktop/evacuation_project/backend/routes/disaster_zones.py
-
 from flask import Blueprint, request, jsonify
-from sqlalchemy import func
-from shapely.geometry import shape
-from geoalchemy2.shape import to_shape
 from models.disaster_zone_model import DisasterZone
 from database import SessionLocal
+from geoalchemy2.shape import from_shape
+from shapely.geometry import shape
+from sqlalchemy.exc import SQLAlchemyError
 
 bp = Blueprint("disaster_zones", __name__)
 
-
-@bp.route("/api/disaster_zones")
-def get_disaster_zones():
+@bp.route("/api/disaster_zones", methods=["POST"])
+def create_disaster_zone():
+    """
+    災害状況ポリゴンの新規登録API
+    例: {
+      "geometry": {...GeoJSON...},
+      "category": "冠水",
+      "disaster_type": "浸水",
+      "water_depth": 1.5,
+      "prefecture": "広島県",
+      "city": "福山市",
+      "source": "管理画面入力",
+      "address": "〇〇町1-2-3"
+    }
+    """
+    data = request.json
     session = SessionLocal()
     try:
-        lat = float(request.args.get("lat"))
-        lng = float(request.args.get("lng"))
-        radius = float(request.args.get("radius", 1000))
-        disaster_type = request.args.get("disaster_type", "")
-
-        point = f"SRID=4326;POINT({lng} {lat})"
-
-        query = session.query(DisasterZone).filter(
-            func.ST_DWithin(
-                DisasterZone.geometry, func.ST_GeomFromText(point, 4326), radius
-            )
+        # GeoJSON→WKT(Shapely→GeoAlchemy2)
+        geom = from_shape(shape(data["geometry"]), srid=4326)
+        zone = DisasterZone(
+            geometry=geom,
+            category=data.get("category"),
+            disaster_type=data.get("disaster_type"),
+            detail_type=data.get("detail_type"),
+            water_depth=data.get("water_depth"),
+            prefecture=data.get("prefecture"),
+            city=data.get("city"),
+            source=data.get("source"),
+            address=data.get("address"),
         )
-
-        if disaster_type:
-            query = query.filter(DisasterZone.category.ilike(f"%{disaster_type}%"))
-
-        results = query.all()
-
-        features = []
-        for zone in results:
-            geom = to_shape(zone.geometry)
-            coordinates = [[list(coord) for coord in geom.exterior.coords]]
-            features.append(
-                {
-                    "type": "Feature",
-                    "geometry": {"type": "Polygon", "coordinates": coordinates},
-                    "properties": {
-                        "category": zone.category,
-                        "source": zone.source,
-                        "address": zone.address,
-                        "prefecture": zone.prefecture,
-                        "created_at": zone.created_at.isoformat(),
-                    },
-                }
-            )
-
-        return jsonify({"type": "FeatureCollection", "features": features})
-    except Exception as e:
+        session.add(zone)
+        session.commit()
+        return jsonify({"id": zone.id}), 201
+    except SQLAlchemyError as e:
+        session.rollback()
         return jsonify({"error": str(e)}), 500
     finally:
         session.close()

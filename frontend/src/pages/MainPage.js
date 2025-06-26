@@ -1,10 +1,10 @@
 // /Users/masashitakao/Desktop/evacuation_project/frontend/src/pages/MainPage.js
 
 import React, { useState } from "react";
-import SearchForm from "../components/SearchForm";
-import CategoryFilter from "../components/CategoryFilter";
-import MapComponent from "../components/MapComponent";
-import ResultCardList from "../components/ResultCardList";
+import SearchForm from "../components/SearchForm.js";
+import CategoryFilter from "../components/CategoryFilter.js";
+import MapComponent from "../components/MapComponent.js";
+import ResultCardList from "../components/ResultCardList.js";
 
 const MainPage = () => {
   const [results, setResults] = useState([]);

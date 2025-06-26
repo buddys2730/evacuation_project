@@ -1,88 +1,218 @@
-// /Users/masashitakao/Desktop/evacuation_project/frontend/src/App.js
-
 import React, { useState } from "react";
-import SearchForm from "./components/SearchForm";
-import MapComponent from "./components/MapComponent";
-import ResultCardList from "./components/ResultCardList";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import SearchForm from "./components/SearchForm.js";
+import MapComponent from "./components/MapComponent.js";
+import ResultCardList from "./components/ResultCardList.js";
+import RouteAlertDialog from "./components/RouteAlertDialog.js";
+import AdminRoot from "./pages/AdminRoot.js";
+import DisasterSituations from "./pages/DisasterSituations.js";
+import ARView from "./components/ARView.js";
 
-function App() {
+function UserApp() {
   const [results, setResults] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [searchParams, setSearchParams] = useState(null);
   const [route, setRoute] = useState(null);
-  const [userLocation, setUserLocation] = useState(null); // ✅ 追加
+  const [userLocation, setUserLocation] = useState(null);
   const [radiusKm, setRadiusKm] = useState(3);
   const [hazardDisplayMode, setHazardDisplayMode] = useState("off");
   const [selectedCategories, setSelectedCategories] = useState([
     "洪水_01_計画規模",
   ]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [routeMessage, setRouteMessage] = useState({ recommendation: "", status: "" });
+  const [showSafeRouteBtn, setShowSafeRouteBtn] = useState(false);
+  const [alternateShelters, setAlternateShelters] = useState([]); // 新規
+  const navigate = useNavigate();
 
+  const minRadius = 1;
+  const maxRadius = 10;
+
+  // AR案内画面への遷移
+  const handleAR = () => {
+    if (!route) return;
+    navigate("/ar", { state: route });
+  };
+
+  // 避難所選択時
+  const handleSelectPoint = (point) => {
+    if (!point) {
+      setSelectedId(null);
+      setRoute(null);
+      setAlternateShelters([]);
+      return;
+    }
+    if (String(selectedId) === String(point.id)) {
+      setSelectedId(null);
+      setRoute(null);
+      setAlternateShelters([]);
+      return;
+    }
+    setSelectedId(String(point.id));
+    setRoute(null);
+    setAlternateShelters([]);
+  };
+
+  // 検索結果取得時
   const handleResults = (data) => {
     setResults(data);
     setSelectedId(null);
     setRoute(null);
+    setAlternateShelters([]);
   };
 
+  // 検索パラメータ受け取り時
   const handleParams = (params) => {
+    if (params.pref && !params.prefecture) params.prefecture = params.pref;
     setSearchParams(params);
-    if (params.radius) {
-      setRadiusKm(params.radius);
+    if (params.radius) setRadiusKm(params.radius);
+  };
+
+  // ルート検索結果をモーダル表示＋危険ルート判定
+  const handleSetRoute = (routeResult) => {
+    setRoute(routeResult);
+    if (routeResult && routeResult.recommendation) {
+      setRouteMessage({
+        recommendation: routeResult.recommendation,
+        status: routeResult.status,
+      });
+      setDialogOpen(true);
+    }
+    // 危険ルートなら安全ルートボタン表示
+    if (routeResult && routeResult.status === "danger") {
+      setShowSafeRouteBtn(true);
+    } else {
+      setShowSafeRouteBtn(false);
+    }
+    // 通行止め時、到達可能避難所候補
+    if (routeResult && routeResult.status === "blocked" && Array.isArray(routeResult.alternate_shelters)) {
+      setAlternateShelters(routeResult.alternate_shelters);
+    } else {
+      setAlternateShelters([]);
     }
   };
 
-  const handleCardClick = (id) => {
-    setSelectedId(id);
-    setRoute(null);
+  // 迂回ルート（安全なルート）検索
+  const handleFindSafeRoute = async () => {
+    if (!searchParams || !selectedId) return;
+    const origin = {
+      lat: searchParams.latitude,
+      lng: searchParams.longitude,
+    };
+    const destinationPoint = results.find((p) => String(p.id) === String(selectedId));
+    if (!destinationPoint) return;
+    const destination = {
+      lat: destinationPoint.latitude,
+      lng: destinationPoint.longitude,
+    };
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/api/route`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            start: [origin.lng, origin.lat],
+            end: [destination.lng, destination.lat],
+            disaster_type: selectedCategories[0]?.split("_")[0] || "洪水",
+            category: selectedCategories[0] || "洪水_01_計画規模",
+            center: [origin.lng, origin.lat],
+            radius_km: radiusKm,
+            prefecture: searchParams?.prefecture || "",
+            avoid_danger: true,
+            user_location: [origin.lng, origin.lat],
+          }),
+        }
+      );
+      const data = await response.json();
+      setRoute(data);
+      setShowSafeRouteBtn(false);
+      if (data && data.recommendation) {
+        setRouteMessage({
+          recommendation: data.recommendation,
+          status: data.status,
+        });
+        setDialogOpen(true);
+      }
+      // 通行止め時の候補
+      if (data && data.status === "blocked" && Array.isArray(data.alternate_shelters)) {
+        setAlternateShelters(data.alternate_shelters);
+      } else {
+        setAlternateShelters([]);
+      }
+    } catch (error) {
+      alert("安全なルートの探索に失敗しました");
+    }
   };
 
-  const handleRouteClick = async (item) => {
-    if (!searchParams) return;
-    setSelectedId(item.id);
-
+  // 代替避難所のルート探索
+  const handleSelectAlternateShelter = async (shelter) => {
+    if (!searchParams || !shelter) return;
+    setSelectedId(shelter.id);
     const origin = {
       lat: searchParams.latitude,
       lng: searchParams.longitude,
     };
     const destination = {
-      lat: item.latitude,
-      lng: item.longitude,
+      lat: shelter.latitude,
+      lng: shelter.longitude,
     };
-
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_BASE_URL}/api/route_check`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/route`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ origin, destination }),
-        },
+          body: JSON.stringify({
+            start: [origin.lng, origin.lat],
+            end: [destination.lng, destination.lat],
+            disaster_type: selectedCategories[0]?.split("_")[0] || "洪水",
+            category: selectedCategories[0] || "洪水_01_計画規模",
+            center: [origin.lng, origin.lat],
+            radius_km: radiusKm,
+            prefecture: searchParams?.prefecture || "",
+            user_location: [origin.lng, origin.lat],
+          }),
+        }
       );
-
       const data = await response.json();
-      const isSafe = data.status === "safe";
-
-      setRoute({
-        latitude: origin.lat,
-        longitude: origin.lng,
-        destinationLat: destination.lat,
-        destinationLng: destination.lng,
-        isSafe,
-      });
+      setRoute(data);
+      // 通行止めなら再度候補リスト（無限ループ防止にmax回数制限も可）
+      if (data && data.status === "blocked" && Array.isArray(data.alternate_shelters)) {
+        setAlternateShelters(data.alternate_shelters);
+      } else {
+        setAlternateShelters([]);
+      }
+      setShowSafeRouteBtn(false);
+      if (data && data.recommendation) {
+        setRouteMessage({
+          recommendation: data.recommendation,
+          status: data.status,
+        });
+        setDialogOpen(true);
+      }
     } catch (error) {
-      console.error("❌ 安全ルートAPI通信失敗:", error);
-      setRoute({
-        latitude: origin.lat,
-        longitude: origin.lng,
-        destinationLat: destination.lat,
-        destinationLng: destination.lng,
-        isSafe: false,
-      });
+      alert("ルート探索に失敗しました");
     }
   };
 
   return (
     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
       <h2>避難所検索システム</h2>
+      <div style={{ marginBottom: "1rem" }}>
+        <label>
+          検索半径: <b>{radiusKm} km</b>
+          <input
+            type="range"
+            min={minRadius}
+            max={maxRadius}
+            step={1}
+            value={radiusKm}
+            onChange={(e) => setRadiusKm(Number(e.target.value))}
+            style={{ width: "200px", marginLeft: "1em" }}
+          />
+        </label>
+      </div>
 
       <div style={{ marginBottom: "1rem" }}>
         <label>表示切替: </label>
@@ -104,7 +234,7 @@ function App() {
           value={selectedCategories}
           onChange={(e) =>
             setSelectedCategories(
-              Array.from(e.target.selectedOptions, (option) => option.value),
+              Array.from(e.target.selectedOptions, (option) => option.value)
             )
           }
           style={{ width: "100%", height: "100px" }}
@@ -123,33 +253,131 @@ function App() {
         onResults={handleResults}
         onSearchParams={handleParams}
         defaultRadius={radiusKm}
-        setUserLocation={setUserLocation} // ✅ ここが必要
+        setUserLocation={setUserLocation}
       />
+
+      {/* 通行止め時：到達可能避難所のリスト */}
+      {route && route.status === "blocked" && (
+        <div style={{ color: "red", fontWeight: "bold", margin: "12px 0" }}>
+          <b>選択した避難所へのルートは通行止めです。</b>
+          <br />
+          近隣の到達可能な避難所を再検索しました。下から再選択してください。
+          {alternateShelters && alternateShelters.length === 0 && (
+            <div style={{ color: "black", fontWeight: "normal" }}>
+              現在到達可能な避難所はありません。安全な場所で待機してください。
+            </div>
+          )}
+          <ul>
+            {alternateShelters && alternateShelters.map((s) => (
+              <li key={s.id} style={{ margin: "8px 0" }}>
+                {s.name} ({s.latitude},{s.longitude})
+                <button
+                  style={{ marginLeft: "1em" }}
+                  onClick={() => handleSelectAlternateShelter(s)}
+                >
+                  この避難所でルート探索
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* 危険ルート時に警告・安全なルート提案・ARボタン表示 */}
+      {route && route.status === "danger" && (
+  <div style={{ color: "red", fontWeight: "bold", margin: "12px 0" }}>
+    このルートは<b>危険</b>です。
+    {route.danger_level && <span> 危険度: {route.danger_level}</span>}
+    {route.depth_m && <span> 水深: {route.depth_m}m</span>}
+    <br />
+    {showSafeRouteBtn && (
+      <button
+        onClick={handleFindSafeRoute}
+        style={{ marginTop: 8, fontWeight: "bold" }}
+      >
+        安全なルートを探す
+      </button>
+    )}
+    {/* ▼AR案内ボタンを危険ルートにも表示 */}
+    <button
+      onClick={handleAR}
+      style={{
+        marginLeft: 12,
+        fontWeight: "bold",
+        background: "#d84315",
+        color: "#fff",
+        padding: "4px 16px",
+        border: "none",
+        borderRadius: "6px",
+      }}
+    >
+      警告を理解した上でAR案内
+    </button>
+  </div>
+)}
+
+
+      {/* 安全ルート時にAR案内ボタン表示 */}
+      {route && route.status === "safe" && (
+        <div style={{ color: "green", fontWeight: "bold", margin: "12px 0" }}>
+          このルートは<b>安全</b>です。
+          <button
+            onClick={handleAR}
+            style={{
+              marginLeft: 12,
+              fontWeight: "bold",
+              background: "#43a047",
+              color: "#fff",
+              padding: "4px 16px",
+              border: "none",
+              borderRadius: "6px",
+            }}
+          >
+            AR案内を開始
+          </button>
+        </div>
+      )}
 
       <MapComponent
         points={results}
         selectedId={selectedId}
+        onSelectPoint={handleSelectPoint}
         route={route}
         radiusKm={radiusKm}
         setRadiusKm={setRadiusKm}
-        setRoute={setRoute}
-        onRouteClick={handleRouteClick}
+        setRoute={handleSetRoute}
         hazardDisplayMode={hazardDisplayMode}
         searchParams={searchParams}
         selectedCategories={selectedCategories}
-        userLocation={userLocation} // ✅ 必要であれば渡す
+        userLocation={userLocation}
       />
 
       {results.length > 0 && (
         <ResultCardList
-          results={results}
-          onCardClick={handleCardClick}
-          onRouteClick={handleRouteClick}
+          points={results}
           selectedId={selectedId}
+          onSelect={handleSelectPoint}
         />
       )}
+      {/* ルート警告ダイアログ */}
+      <RouteAlertDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        recommendation={routeMessage.recommendation}
+        status={routeMessage.status}
+      />
     </div>
   );
 }
 
-export default App;
+// App本体で「ルートの切り替え」のみ行う
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<UserApp />} />
+      <Route path="/admin" element={<AdminRoot />} />
+      <Route path="/disaster-situations" element={<DisasterSituations />} />
+      <Route path="/ar" element={<ARView />} />
+    </Routes>
+  );
+}

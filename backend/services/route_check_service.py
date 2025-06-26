@@ -5,7 +5,7 @@ import requests
 import json
 from flask import Blueprint, jsonify, request
 from dotenv import load_dotenv
-from backend.services.db_connection import get_db_connection
+from services.db_connection import get_db_connection
 
 # Blueprint 作成
 route_check_service = Blueprint("route_check_service", __name__)

@@ -4,7 +4,7 @@ import psycopg2
 import os
 from flask import jsonify, request, Blueprint
 from dotenv import load_dotenv
-from backend.services.db_connection import get_db_connection
+from services.db_connection import get_db_connection
 
 search_service = Blueprint("search_service", __name__)
 
@@ -15,6 +15,11 @@ load_dotenv(dotenv_path=os.path.join(BASE_DIR, ".env"))
 
 # DB接続
 def get_db_connection():
+    print("PG_DBNAME:", os.getenv("PG_DBNAME"))
+    print("PG_USER:", os.getenv("PG_USER"))
+    print("PG_PASSWORD:", os.getenv("PG_PASSWORD"))
+    print("PG_HOST:", os.getenv("PG_HOST"))
+    print("PG_PORT:", os.getenv("PG_PORT"))
     return psycopg2.connect(
         dbname=os.getenv("PG_DBNAME"),
         user=os.getenv("PG_USER"),

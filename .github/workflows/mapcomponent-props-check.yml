@@ -1,0 +1,27 @@
+name: MapComponent設計.mdとprops完全一致チェック
+
+on:
+  push:
+    paths:
+      - 'docs/mapComponent.md'
+      - 'src/components/MapComponent.js'
+  pull_request:
+    paths:
+      - 'docs/mapComponent.md'
+      - 'src/components/MapComponent.js'
+
+jobs:
+  check-mapcomponent-props:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Check props一致
+        run: |
+          cd frontend
+          npm install
+          node scripts/check-mapcomponent-design.js

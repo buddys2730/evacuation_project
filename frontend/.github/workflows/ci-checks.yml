@@ -1,0 +1,3 @@
+
+- name: MapComponent設計.mdとコードの整合性チェック
+  run: npm run check:mapcomponent

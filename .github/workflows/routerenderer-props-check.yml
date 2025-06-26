@@ -1,0 +1,27 @@
+name: RouteRenderer設計mdとprops完全一致チェック
+
+on:
+  push:
+    paths:
+      - 'docs/RouteRenderer.md'
+      - 'src/components/map/RouteRenderer.js'
+  pull_request:
+    paths:
+      - 'docs/RouteRenderer.md'
+      - 'src/components/map/RouteRenderer.js'
+
+jobs:
+  check-routerenderer-props:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Check RouteRenderer props一致
+        run: |
+          cd frontend
+          npm install
+          npm run check:routerenderer

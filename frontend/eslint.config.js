@@ -9,23 +9,21 @@ export default [
       ecmaVersion: "latest",
       globals: {
         ...globals.browser,
-        ...globals.node,
+        ...globals.node
       },
       parserOptions: {
-        ecmaFeatures: { jsx: true },
-      },
+        ecmaFeatures: { jsx: true }
+      }
     },
     plugins: { react },
     rules: {
-      // ベース: eslint:recommended
       "no-unused-vars": "warn",
       "no-undef": "error",
       "no-console": "warn",
       "no-debugger": "warn",
-      eqeqeq: "error",
-      // React推奨
+      "eqeqeq": "error",
       "react/jsx-uses-react": "off",
-      "react/react-in-jsx-scope": "off",
-    },
-  },
+      "react/react-in-jsx-scope": "off"
+    }
+  }
 ];

@@ -1,0 +1,27 @@
+name: SearchResultMarkers設計mdとprops完全一致チェック
+
+on:
+  push:
+    paths:
+      - 'docs/SearchResultMarkers.md'
+      - 'src/components/map/SearchResultMarkers.js'
+  pull_request:
+    paths:
+      - 'docs/SearchResultMarkers.md'
+      - 'src/components/map/SearchResultMarkers.js'
+
+jobs:
+  check-searchresultmarkers-props:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Check SearchResultMarkers props一致
+        run: |
+          cd frontend
+          npm install
+          npm run check:searchresultmarkers

@@ -3,15 +3,39 @@ import PropTypes from "prop-types";
 import { GoogleMap, LoadScript, Circle } from "@react-google-maps/api";
 import UserMarker from "./map/UserMarker.js";
 import SearchResultMarkers from "./map/SearchResultMarkers.js";
-import RouteRenderer from "./map/RouteRenderer.js";
+import RouteRenderer from "./RouteRenderer.js";
 import HazardPolygonRenderer from "./map/HazardPolygonRenderer.js";
 import { fetchHazardPolygons } from "../services/fetchHazardPolygons.js";
+
+// ルートAPIリクエスト
+async function fetchRoute(start, end, disasterType, center, radiusKm, prefecture) {
+  try {
+    const response = await fetch(
+      `${process.env.REACT_APP_API_BASE_URL}/api/route`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          start,
+          end,
+          disaster_type: disasterType,
+          center,
+          radius_km: radiusKm,
+          prefecture,
+        }),
+      }
+    );
+    return await response.json();
+  } catch (err) {
+    alert("ルートAPI通信エラー");
+    return null;
+  }
+}
 
 const MapComponent = ({
   points,
   selectedId,
   onSelectPoint,
-  route,
   radiusKm,
   setRadiusKm,
   setRoute,
@@ -22,6 +46,7 @@ const MapComponent = ({
 }) => {
   const mapRef = useRef(null);
   const [hazardPolygons, setHazardPolygons] = useState([]);
+  const [routeData, setRouteData] = useState(null);
 
   // マップ中心座標
   const center = useMemo(() => {
@@ -30,48 +55,81 @@ const MapComponent = ({
     return { lat: 35.681236, lng: 139.767125 };
   }, [searchParams, userLocation]);
 
-  // DBからhazardPolygonsをAPI経由で自動取得
+  // ポイントクリック時にルート検索
+  const handleMarkerClick = async (point) => {
+    if (!userLocation) {
+      alert("現在地が取得できません。");
+      return;
+    }
+    onSelectPoint(point);
+    const disasterType =
+      selectedCategories && selectedCategories.length > 0
+        ? selectedCategories[0].split("_")[0]
+        : "洪水";
+    const category =
+      selectedCategories && selectedCategories.length > 0
+        ? selectedCategories[0]
+        : "洪水_01_計画規模";
+    const prefecture = searchParams?.prefecture || searchParams?.pref || "";
+    const start = [userLocation.lng, userLocation.lat];
+    const end = [point.lng || point.longitude, point.lat || point.latitude];
+
+    const routeResult = await fetchRoute(
+      start,
+      end,
+      disasterType,
+      [center.lng, center.lat],
+      radiusKm,
+      prefecture
+    );
+
+    if (routeResult && Array.isArray(routeResult.route)) {
+      setRouteData(routeResult);
+      setRoute && setRoute(routeResult);
+    } else {
+      setRouteData(null);
+      setRoute && setRoute(null);
+    }
+  };
+
+  // ハザード・災害状況ポリゴン取得
   useEffect(() => {
-    console.log(
-      "useEffect発火:",
-      hazardDisplayMode,
-      center,
-      selectedCategories,
-      radiusKm,
-    );
-    console.log("searchParamsの中身:", searchParams);
-    console.log(
-      "fetchHazardPolygons呼び出し値 lat:",
-      center.lat,
-      "lng:",
-      center.lng,
-    );
-    console.log(
-      "useEffect発火:",
-      hazardDisplayMode,
-      center,
-      selectedCategories,
-      radiusKm,
-    );
     let isMounted = true;
     const loadHazardPolygons = async () => {
       if (
-        hazardDisplayMode === "hazard" &&
+        (hazardDisplayMode === "hazard" || hazardDisplayMode === "disaster") &&
         center &&
-        selectedCategories.length > 0
+        selectedCategories &&
+        selectedCategories.length > 0 &&
+        (searchParams?.prefecture || searchParams?.pref)
       ) {
-        console.log("ハザードポリゴン取得APIリクエスト実行");
+        const category = Array.isArray(selectedCategories)
+          ? selectedCategories[0]
+          : selectedCategories;
+        const prefecture = searchParams.prefecture || searchParams.pref;
+        const lat = center.lat;
+        const lng = center.lng;
+        if (!category || !prefecture || !lat || !lng) {
+          setHazardPolygons([]);
+          return;
+        }
         try {
-          // ここを修正！（prefecture名を正しく渡す）
-          const fetched = await fetchHazardPolygons(
-            selectedCategories,
-            center.lat,
-            center.lng,
+          // /api/hazard-polygons で静的＋動的（災害状況）両方のポリゴンが返る
+          const polygons = await fetchHazardPolygons(
+            category,
+            lat,
+            lng,
             radiusKm,
-            searchParams?.prefecture || searchParams?.pref, // どちらか値がある方を使う
+            prefecture,
+            hazardDisplayMode
           );
-
-          if (isMounted) setHazardPolygons(fetched);
+          // featureCollection形式も素配列も両対応
+          let arr =
+            polygons?.features ||
+            (Array.isArray(polygons) ? polygons : []);
+          if (isMounted) {
+            setHazardPolygons(arr);
+          }
         } catch (err) {
           setHazardPolygons([]);
         }
@@ -83,7 +141,15 @@ const MapComponent = ({
     return () => {
       isMounted = false;
     };
-  }, [hazardDisplayMode, center.lat, center.lng, selectedCategories, radiusKm]);
+  }, [
+    hazardDisplayMode,
+    center.lat,
+    center.lng,
+    selectedCategories,
+    radiusKm,
+    searchParams?.prefecture,
+    searchParams?.pref,
+  ]);
 
   return (
     <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
@@ -109,61 +175,27 @@ const MapComponent = ({
           points={points}
           selectedId={selectedId}
           onSelect={onSelectPoint}
+          onMarkerClick={handleMarkerClick}
         />
-        <RouteRenderer route={route} />
-        {route && (
-          <button
-            style={{
-              position: "absolute",
-              top: "10px",
-              left: "10px",
-              zIndex: 10,
-              padding: "8px 12px",
-              backgroundColor: "#1976d2",
-              color: "#fff",
-              border: "none",
-              borderRadius: "4px",
-            }}
-            onClick={async () => {
-              const routePoints =
-                route.routes?.[0]?.overview_path?.map((pt) => ({
-                  lat: pt.lat(),
-                  lng: pt.lng(),
-                })) || [];
 
-              try {
-                const response = await fetch(
-                  `${process.env.REACT_APP_API_BASE_URL}/api/route-safety`,
-                  {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ route: routePoints }),
-                  },
-                );
-                const data = await response.json();
-                if (data.status === "success") {
-                  if (data.result.status === "danger") {
-                    alert("⚠️ 危険な地点が含まれています！");
-                  } else {
-                    alert("✅ このルートは安全です。");
-                  }
-                } else {
-                  alert("⚠️ 判定エラー: " + data.message);
-                }
-              } catch (err) {
-                alert("❌ 通信に失敗しました");
-              }
-            }}
-          >
-            このルートの安全性をチェック
-          </button>
+        {/* ルートを描画 */}
+        {routeData && (
+          <RouteRenderer
+            route={
+              Array.isArray(routeData.route)
+                ? routeData.route.map(([lng, lat]) => ({ lat, lng }))
+                : []
+            }
+            sections={routeData.sections || []}
+            dangerZones={routeData.danger_zones || []}
+            roadClosures={routeData.road_closures || []}
+            status={routeData.status}
+            recommendation={routeData.recommendation}
+          />
         )}
-        {hazardDisplayMode === "hazard" && (
-          <>
-            {console.log("MapComponentで受け取った polygons =", hazardPolygons)}
-            <HazardPolygonRenderer polygons={hazardPolygons} />
-          </>
-        )}
+
+        {/* ハザード・災害状況ポリゴン描画 */}
+        <HazardPolygonRenderer polygons={hazardPolygons} />
       </GoogleMap>
     </LoadScript>
   );
@@ -173,10 +205,9 @@ MapComponent.propTypes = {
   points: PropTypes.array.isRequired,
   selectedId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onSelectPoint: PropTypes.func.isRequired,
-  route: PropTypes.object,
   radiusKm: PropTypes.number.isRequired,
   setRadiusKm: PropTypes.func.isRequired,
-  setRoute: PropTypes.func.isRequired,
+  setRoute: PropTypes.func,
   hazardDisplayMode: PropTypes.string.isRequired,
   searchParams: PropTypes.object,
   selectedCategories: PropTypes.array.isRequired,

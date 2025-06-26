@@ -1,26 +1,21 @@
-import PropTypes from "prop-types";
-// /components/map/UserMarker.js
 import React from "react";
-import { Circle } from "@react-google-maps/api";
+import PropTypes from "prop-types";
+import { Marker } from "@react-google-maps/api";
 
-const UserMarker = ({ userLocation, radius = 1000 }) => {
-  if (!userLocation) return null;
+/**
+ * UserMarker 現在地をマップ上に表示するマイクロシステム
+ * @param {{ position: {lat: number, lng: number} }} props
+ */
+const UserMarker = ({ position }) => {
+  if (!position) return null;
+  return <Marker position={position} label="現在地" />;
+};
 
-  const circleOptions = {
-    strokeColor: "#1976d2",
-    strokeOpacity: 0.8,
-    strokeWeight: 2,
-    fillColor: "#1976d2",
-    fillOpacity: 0.2,
-  };
-
-  return (
-    <Circle center={userLocation} radius={radius} options={circleOptions} />
-  );
+UserMarker.propTypes = {
+  position: PropTypes.shape({
+    lat: PropTypes.number.isRequired,
+    lng: PropTypes.number.isRequired,
+  }).isRequired,
 };
 
 export default UserMarker;
-
-UserMarker.propTypes = {
-  // 自動挿入: 必要に応じて手動で編集してください
-};
