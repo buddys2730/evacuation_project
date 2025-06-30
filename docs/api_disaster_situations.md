@@ -42,19 +42,15 @@ GET /admin/disaster-situations/export
 
 クエリパラメータ：上記と同じ
 CSV例
-
 id,disaster_type,danger_level,address_label,occurred_at,cleared_at,comment,geometry
 1,洪水,高,松永町3丁目15番地辺り,2025-06-06T01:00:00,,道路冠水,"POLYGON((133.29 34.54,133.3 34.55,133.29 34.55,133.29 34.54))"
-
 3. 市区町村リスト取得
 GET /api/cities?pref=都道府県名
 
 レスポンス例:
-
 [
   { "code": "34207", "name": "福山市" }
 ]
-
 4. 災害種別/危険度リスト
 クライアント固定、または必要に応じてAPI化可能
 備考
@@ -62,11 +58,3 @@ GET /api/cities?pref=都道府県名
 認証・認可は管理者のみ
 今後、予測/写真/IoT等拡張予定
 作成日: 2025-06-24
-使い方
-
-それぞれ docs/disaster_situation_dashboard.md
-docs/api_disaster_situations.md などのファイル名で保存してください。
-必要に応じて運用マニュアルやFAQも追加可能です。
-これらを基礎に、今後の設計/引き継ぎ/機能追加も明文化できます。
-実装も引き続き進めます。
-```
