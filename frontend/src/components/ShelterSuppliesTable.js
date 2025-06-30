@@ -29,14 +29,22 @@ export default function ShelterSuppliesTable({ data }) {
 
   return (
     <div style={{ width: "100%", overflowX: "auto" }}>
-      <table border="1" cellPadding="8" cellSpacing="0" style={{ width: "100%", minWidth: 600 }}>
+      <table
+        border="1"
+        cellPadding="8"
+        cellSpacing="0"
+        style={{ width: "100%", minWidth: 600 }}
+      >
         <thead>
           <tr>
             {columns.map((col) => (
               <th
                 key={col.key}
                 onClick={() => handleSort(col.key)}
-                style={{ cursor: "pointer", background: sortKey === col.key ? "#f0f0f0" : "#fff" }}
+                style={{
+                  cursor: "pointer",
+                  background: sortKey === col.key ? "#f0f0f0" : "#fff",
+                }}
               >
                 {col.label}
                 {sortKey === col.key ? (sortOrder === "asc" ? " ▲" : " ▼") : ""}
@@ -47,7 +55,9 @@ export default function ShelterSuppliesTable({ data }) {
         <tbody>
           {sortedData.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} style={{ textAlign: "center" }}>データがありません</td>
+              <td colSpan={columns.length} style={{ textAlign: "center" }}>
+                データがありません
+              </td>
             </tr>
           ) : (
             sortedData.map((row) => (

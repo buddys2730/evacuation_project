@@ -7,7 +7,7 @@ export default function DisasterSituationForm({ onSubmit }) {
 
   return (
     <form
-      onSubmit={e => {
+      onSubmit={(e) => {
         e.preventDefault();
         onSubmit({
           disaster_type: disasterType,
@@ -17,14 +17,20 @@ export default function DisasterSituationForm({ onSubmit }) {
         });
       }}
     >
-      <select value={disasterType} onChange={e => setDisasterType(e.target.value)}>
+      <select
+        value={disasterType}
+        onChange={(e) => setDisasterType(e.target.value)}
+      >
         <option value="">災害種別を選択</option>
         <option value="浸水">浸水</option>
         <option value="土砂">土砂</option>
         <option value="通行止め">通行止め</option>
         {/* ... */}
       </select>
-      <select value={dangerLevel} onChange={e => setDangerLevel(e.target.value)}>
+      <select
+        value={dangerLevel}
+        onChange={(e) => setDangerLevel(e.target.value)}
+      >
         <option value="">危険度を選択</option>
         <option value="低">低</option>
         <option value="中">中</option>
@@ -37,7 +43,7 @@ export default function DisasterSituationForm({ onSubmit }) {
           step="0.01"
           min="0"
           value={depthM}
-          onChange={e => setDepthM(e.target.value)}
+          onChange={(e) => setDepthM(e.target.value)}
           placeholder="水深（m）"
         />
       )}

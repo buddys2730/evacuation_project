@@ -9,9 +9,12 @@ export default function CitySelect({ pref, value, onChange }) {
       onChange("");
       return;
     }
-    fetch(process.env.REACT_APP_API_BASE_URL + `/api/cities?pref=${encodeURIComponent(pref)}`)
-      .then(r => r.json())
-      .then(data => {
+    fetch(
+      process.env.REACT_APP_API_BASE_URL +
+        `/api/cities?pref=${encodeURIComponent(pref)}`,
+    )
+      .then((r) => r.json())
+      .then((data) => {
         // 修正：オブジェクト形式にも対応
         let cityArr = [];
         if (Array.isArray(data)) {
@@ -25,10 +28,16 @@ export default function CitySelect({ pref, value, onChange }) {
   }, [pref, onChange]);
 
   return (
-    <select value={value} onChange={e => onChange(e.target.value)} disabled={!pref}>
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      disabled={!pref}
+    >
       <option value="">市町村選択</option>
-      {cities.map(c => (
-        <option key={c.code || c.name} value={c.name}>{c.name}</option>
+      {cities.map((c) => (
+        <option key={c.code || c.name} value={c.name}>
+          {c.name}
+        </option>
       ))}
     </select>
   );

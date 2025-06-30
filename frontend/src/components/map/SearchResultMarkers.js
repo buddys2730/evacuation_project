@@ -14,7 +14,7 @@ const SearchResultMarkers = ({
   points,
   selectedId,
   onSelect,
-  onMarkerClick
+  onMarkerClick,
 }) => {
   // 型安全なlat/lng変換
   const safePoints = Array.isArray(points)
@@ -25,29 +25,29 @@ const SearchResultMarkers = ({
             typeof point.lat === "number"
               ? point.lat
               : point.lat
-              ? parseFloat(point.lat)
-              : typeof point.latitude === "number"
-              ? point.latitude
-              : point.latitude
-              ? parseFloat(point.latitude)
-              : undefined,
+                ? parseFloat(point.lat)
+                : typeof point.latitude === "number"
+                  ? point.latitude
+                  : point.latitude
+                    ? parseFloat(point.latitude)
+                    : undefined,
           lng:
             typeof point.lng === "number"
               ? point.lng
               : point.lng
-              ? parseFloat(point.lng)
-              : typeof point.longitude === "number"
-              ? point.longitude
-              : point.longitude
-              ? parseFloat(point.longitude)
-              : undefined,
+                ? parseFloat(point.lng)
+                : typeof point.longitude === "number"
+                  ? point.longitude
+                  : point.longitude
+                    ? parseFloat(point.longitude)
+                    : undefined,
         }))
         .filter(
           (p) =>
             typeof p.lat === "number" &&
             typeof p.lng === "number" &&
             !isNaN(p.lat) &&
-            !isNaN(p.lng)
+            !isNaN(p.lng),
         )
     : [];
 
@@ -95,7 +95,8 @@ const SearchResultMarkers = ({
                 </div>
                 <div>
                   物資状況:
-                  {Array.isArray(point.supplies) && point.supplies.length > 0 ? (
+                  {Array.isArray(point.supplies) &&
+                  point.supplies.length > 0 ? (
                     <ul style={{ margin: 0, paddingLeft: 16 }}>
                       {point.supplies.map((item) => (
                         <li key={item.id || item.item_name}>

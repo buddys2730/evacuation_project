@@ -20,7 +20,10 @@ function UserApp() {
     "洪水_01_計画規模",
   ]);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [routeMessage, setRouteMessage] = useState({ recommendation: "", status: "" });
+  const [routeMessage, setRouteMessage] = useState({
+    recommendation: "",
+    status: "",
+  });
   const [showSafeRouteBtn, setShowSafeRouteBtn] = useState(false);
   const [alternateShelters, setAlternateShelters] = useState([]);
   const [suppliesMap, setSuppliesMap] = useState({});
@@ -85,7 +88,11 @@ function UserApp() {
     } else {
       setShowSafeRouteBtn(false);
     }
-    if (routeResult && routeResult.status === "blocked" && Array.isArray(routeResult.alternate_shelters)) {
+    if (
+      routeResult &&
+      routeResult.status === "blocked" &&
+      Array.isArray(routeResult.alternate_shelters)
+    ) {
       setAlternateShelters(routeResult.alternate_shelters);
     } else {
       setAlternateShelters([]);
@@ -99,7 +106,9 @@ function UserApp() {
       lat: searchParams.latitude,
       lng: searchParams.longitude,
     };
-    const destinationPoint = results.find((p) => String(p.id) === String(selectedId));
+    const destinationPoint = results.find(
+      (p) => String(p.id) === String(selectedId),
+    );
     if (!destinationPoint) return;
     const destination = {
       lat: destinationPoint.latitude,
@@ -122,7 +131,7 @@ function UserApp() {
             avoid_danger: true,
             user_location: [origin.lng, origin.lat],
           }),
-        }
+        },
       );
       const data = await response.json();
       setRoute(data);
@@ -134,7 +143,11 @@ function UserApp() {
         });
         setDialogOpen(true);
       }
-      if (data && data.status === "blocked" && Array.isArray(data.alternate_shelters)) {
+      if (
+        data &&
+        data.status === "blocked" &&
+        Array.isArray(data.alternate_shelters)
+      ) {
         setAlternateShelters(data.alternate_shelters);
       } else {
         setAlternateShelters([]);
@@ -172,11 +185,15 @@ function UserApp() {
             prefecture: searchParams?.prefecture || "",
             user_location: [origin.lng, origin.lat],
           }),
-        }
+        },
       );
       const data = await response.json();
       setRoute(data);
-      if (data && data.status === "blocked" && Array.isArray(data.alternate_shelters)) {
+      if (
+        data &&
+        data.status === "blocked" &&
+        Array.isArray(data.alternate_shelters)
+      ) {
         setAlternateShelters(data.alternate_shelters);
       } else {
         setAlternateShelters([]);
@@ -232,7 +249,7 @@ function UserApp() {
           value={selectedCategories}
           onChange={(e) =>
             setSelectedCategories(
-              Array.from(e.target.selectedOptions, (option) => option.value)
+              Array.from(e.target.selectedOptions, (option) => option.value),
             )
           }
           style={{ width: "100%", height: "100px" }}
@@ -266,17 +283,18 @@ function UserApp() {
             </div>
           )}
           <ul>
-            {alternateShelters && alternateShelters.map((s) => (
-              <li key={s.id} style={{ margin: "8px 0" }}>
-                {s.name} ({s.latitude},{s.longitude})
-                <button
-                  style={{ marginLeft: "1em" }}
-                  onClick={() => handleSelectAlternateShelter(s)}
-                >
-                  この避難所でルート探索
-                </button>
-              </li>
-            ))}
+            {alternateShelters &&
+              alternateShelters.map((s) => (
+                <li key={s.id} style={{ margin: "8px 0" }}>
+                  {s.name} ({s.latitude},{s.longitude})
+                  <button
+                    style={{ marginLeft: "1em" }}
+                    onClick={() => handleSelectAlternateShelter(s)}
+                  >
+                    この避難所でルート探索
+                  </button>
+                </li>
+              ))}
           </ul>
         </div>
       )}

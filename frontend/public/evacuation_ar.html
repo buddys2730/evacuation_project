@@ -1,236 +1,341 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-  <meta charset="utf-8" />
-  <title>避難所AR誘導</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-  <script src="/aframe-ar-nft.js"></script>
-  <style>
-    html, body { margin:0; padding:0; background:transparent !important; height:100%; }
-    #guide-section { background:#f8fff4; border-radius:10px; padding:14px 12px; margin:14px 0; color:#234; font-size:1em; box-shadow:0 1px 6px #d2f2dd50; line-height:1.7; max-width:340px; margin:18px auto;}
-    #ar-main { display:none; }
-    .ar-label {
-      background: #3097ff;
-      color: #fff;
-      border-radius: 10px;
-      padding: 7px 14px;
-      font-size: 1em;
-      font-weight: bold;
-      box-shadow: 0 2px 8px rgba(38,58,140,0.10);
-      position: absolute;
-      top: 12px; left: 50%; transform: translateX(-50%);
-      z-index: 20; letter-spacing: 0.06em; pointer-events: none; min-width: 160px;
-    }
-    .arrow-v {
-  position: absolute;
-  left: 50%;
-  top: 55%;
-  width: 250px;    /* 好みで調整 */
-  height: 100px;   /* 好みで調整 */
-  opacity: 0.77;  /* ← 透明度0.0～1.0で調整。0.7～0.85が自然です */
-  transform: translate(-50%, -50%) rotate(0deg);
-  z-index: 12;
-  pointer-events: none;
-  display: none;
-  background: linear-gradient(135deg, #186dff, #c126dc);  /* 色は自由 */
-  /* 山型三角形: 底辺中央を上げる（人型clip-path） */
-  clip-path: polygon(
-    0% 100%,     /* 左下端 */
-    50% 60%,     /* 底辺中央を上に持ち上げる */
-    100% 100%,   /* 右下端 */
-    50% 0%       /* 上先端 */
-  );
-  box-shadow: 0 2px 18px #a38bff55;
-}
-
-
-    .ar-info-panel {
-      position: absolute; left: 10px; bottom: 14px;
-      background: rgba(0,0,0,0.68); color: #fff;
-      border-radius: 8px; padding: 6px 11px;
-      font-size: 0.93em; box-shadow: 0 2px 7px rgba(0,0,0,0.13);
-      z-index: 20; min-width: 120px; max-width: 68vw;
-    }
-    .ar-info-panel b { color: #f3f376; font-weight: bold; font-size:1em; }
-    .ar-info-panel .row { margin-bottom: 5px; font-size: 0.98em;}
-    #start-ar-btn {
-      display:block; margin:14px auto 0 auto; background:#376bfc;
-      color:#fff; font-weight:bold; font-size:1em; padding:9px 22px;
-      border:none; border-radius:8px; box-shadow:0 1px 6px #c7d9f6cc;
-      cursor:pointer; transition:.2s; outline:none;
-    }
-    #start-ar-btn:active { background:#2546a1; }
-  </style>
-</head>
-<body>
-  <div id="guide-section">
-    <b style="font-size:1.07em;">【AR初回利用時のご案内】</b><br>
-    本サービスでは<b>カメラ・位置情報・センサーの許可</b>が必要です。<br>
-    <ul style="margin: 8px 0 0 20px;">
-      <li>「カメラ起動」ボタンを<b>必ずタップ</b>してください。</li>
-      <li>iPhoneの方<br>
-        1. 設定→Safari→カメラ/位置情報→<b>許可</b><br>
-        2. アドレスバー左「AA」→Webサイトの設定→カメラ/位置情報→<b>許可</b></li>
-      <li>Androidの方：画面下の許可ダイアログを<b>許可</b>してください。</li>
-      <li>動作しない場合はリロードや端末の再起動をお試しください。</li>
-    </ul>
-    <button id="start-ar-btn">カメラ起動</button>
-  </div>
-  <div id="ar-main" style="width:100vw;height:100vh;">
-    <div id="label" class="ar-label" style="display:none"></div>
-    <!-- ▼CSS製矢印（北向きが基準。clip-pathでV字凹み型） -->
-    <div id="arrow" class="arrow-v">
-      <div class="arrow-v-shape"></div>
-    </div>
-    <div id="info-panel" class="ar-info-panel" style="display:none">
-      <div class="row" id="row-name"></div>
-      <div class="row" id="row-distance">距離: <b id="distance-val">--</b></div>
-      <div class="row" id="row-elev"></div>
-      <div class="row" id="row-turns"></div>
-      <div class="row" id="row-supplies"></div>
-      <div class="row" id="row-crowd"></div>
-    </div>
-    <a-scene
-      embedded
-      vr-mode-ui="enabled: false"
-      arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
-      renderer="logarithmicDepthBuffer: true;"
-      device-orientation-permission-ui="enabled: true"
-    >
-      <a-camera gps-camera rotation-reader></a-camera>
-    </a-scene>
-  </div>
-  <script>
-    function getParam(name) {
-      const url = new URL(window.location.href);
-      return url.searchParams.get(name);
-    }
-    const shelterLat = parseFloat(getParam('lat'));
-    const shelterLng = parseFloat(getParam('lng'));
-    const shelterName = getParam('name') || "避難所";
-    const turns = getParam('turns');
-    let elevShelter = getParam('elev');
-    elevShelter =
-      elevShelter && elevShelter !== "null" && elevShelter !== "undefined" && elevShelter !== ""
-        ? (isNaN(parseFloat(elevShelter)) ? elevShelter : parseFloat(elevShelter).toFixed(1))
-        : "--";
-    let supplies = getParam('supplies');
-    let crowd = getParam('crowd');
-    supplies = (!supplies || supplies === "null" || supplies === "undefined") ? "--" : supplies;
-    crowd    = (!crowd    || crowd    === "null" || crowd    === "undefined") ? "--" : crowd;
-    async function requestSensorPermissionIfNeeded() {
-      let requested = false;
-      if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
-        try { await DeviceMotionEvent.requestPermission(); requested = true; } catch (e) {}
+  <head>
+    <meta charset="utf-8" />
+    <title>避難所AR誘導</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="/aframe-ar-nft.js"></script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: transparent !important;
+        height: 100%;
       }
-      if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
-        try { await DeviceOrientationEvent.requestPermission(); requested = true; } catch (e) {}
+      #guide-section {
+        background: #f8fff4;
+        border-radius: 10px;
+        padding: 14px 12px;
+        margin: 14px 0;
+        color: #234;
+        font-size: 1em;
+        box-shadow: 0 1px 6px #d2f2dd50;
+        line-height: 1.7;
+        max-width: 340px;
+        margin: 18px auto;
       }
-      return requested;
-    }
-    document.getElementById('start-ar-btn').onclick = async function() {
-      await requestSensorPermissionIfNeeded();
-      document.getElementById('guide-section').style.display = 'none';
-      document.getElementById('ar-main').style.display = 'block';
-      setupAR();
-    };
-    function setupAR() {
-      const label = document.getElementById('label');
-      label.innerText = `${shelterName} 方向`;
-      label.style.display = 'block';
-      const infoPanel = document.getElementById('info-panel');
-      infoPanel.style.display = "block";
-      document.getElementById('row-name').innerHTML =
-        shelterName ? `🏫 <b>${shelterName}</b>` : "";
-      document.getElementById('row-elev').innerHTML =
-        elevShelter && elevShelter !== "--"
-        ? `⛰️ 標高: <b>${elevShelter} m</b>` : "";
-      document.getElementById('row-turns').innerHTML =
-        turns && turns !== "" && turns !== "null" && turns !== "undefined"
-        ? `🔄 曲がり角数: <b>${turns}</b>` : "";
-      document.getElementById('row-supplies').innerHTML =
-        `🛒 必要物資: <b>${supplies}</b>`;
-      document.getElementById('row-crowd').innerHTML =
-        `👥 混雑度: <b>${crowd}</b>`;
-      const scene = document.querySelector('a-scene');
-      const marker = document.createElement('a-entity');
-      marker.setAttribute('gps-entity-place', `latitude: ${shelterLat}; longitude: ${shelterLng};`);
-      marker.setAttribute('look-at', '[gps-camera]');
-      marker.setAttribute('geometry', 'primitive: cone; height: 8; radiusBottom: 2.2; radiusTop: 0.15;');
-      marker.setAttribute('material', 'color: #9b2fff; opacity: 0.93');
-      marker.setAttribute('scale', '2.2 2.2 2.2');
-      const text = document.createElement('a-text');
-      text.setAttribute('value', shelterName);
-      text.setAttribute('color', '#fff');
-      text.setAttribute('align', 'center');
-      text.setAttribute('position', '0 5 0');
-      text.setAttribute('width', '18');
-      marker.appendChild(text);
-      scene.appendChild(marker);
-      const arrow = document.getElementById('arrow');
-      arrow.style.display = 'block';
-      let currentLat = null, currentLng = null, currentHeading = 0;
-      window.addEventListener("gps-camera-update-position", function (e) {
-        currentLat = e.detail.position.latitude;
-        currentLng = e.detail.position.longitude;
-        updateArrow();
-        updateDistance();
-      });
-      function onOrientation(event) {
-        let heading = null;
-        if (typeof event.webkitCompassHeading === "number") {
-          heading = event.webkitCompassHeading;
-        } else if (typeof event.alpha === "number") {
-          heading = 360 - event.alpha;
+      #ar-main {
+        display: none;
+      }
+      .ar-label {
+        background: #3097ff;
+        color: #fff;
+        border-radius: 10px;
+        padding: 7px 14px;
+        font-size: 1em;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(38, 58, 140, 0.1);
+        position: absolute;
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 20;
+        letter-spacing: 0.06em;
+        pointer-events: none;
+        min-width: 160px;
+      }
+      .arrow-v {
+        position: absolute;
+        left: 50%;
+        top: 55%;
+        width: 250px; /* 好みで調整 */
+        height: 100px; /* 好みで調整 */
+        opacity: 0.77; /* ← 透明度0.0～1.0で調整。0.7～0.85が自然です */
+        transform: translate(-50%, -50%) rotate(0deg);
+        z-index: 12;
+        pointer-events: none;
+        display: none;
+        background: linear-gradient(135deg, #186dff, #c126dc); /* 色は自由 */
+        /* 山型三角形: 底辺中央を上げる（人型clip-path） */
+        clip-path: polygon(
+          0% 100%,
+          /* 左下端 */ 50% 60%,
+          /* 底辺中央を上に持ち上げる */ 100% 100%,
+          /* 右下端 */ 50% 0% /* 上先端 */
+        );
+        box-shadow: 0 2px 18px #a38bff55;
+      }
+
+      .ar-info-panel {
+        position: absolute;
+        left: 10px;
+        bottom: 14px;
+        background: rgba(0, 0, 0, 0.68);
+        color: #fff;
+        border-radius: 8px;
+        padding: 6px 11px;
+        font-size: 0.93em;
+        box-shadow: 0 2px 7px rgba(0, 0, 0, 0.13);
+        z-index: 20;
+        min-width: 120px;
+        max-width: 68vw;
+      }
+      .ar-info-panel b {
+        color: #f3f376;
+        font-weight: bold;
+        font-size: 1em;
+      }
+      .ar-info-panel .row {
+        margin-bottom: 5px;
+        font-size: 0.98em;
+      }
+      #start-ar-btn {
+        display: block;
+        margin: 14px auto 0 auto;
+        background: #376bfc;
+        color: #fff;
+        font-weight: bold;
+        font-size: 1em;
+        padding: 9px 22px;
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 1px 6px #c7d9f6cc;
+        cursor: pointer;
+        transition: 0.2s;
+        outline: none;
+      }
+      #start-ar-btn:active {
+        background: #2546a1;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="guide-section">
+      <b style="font-size: 1.07em">【AR初回利用時のご案内】</b><br />
+      本サービスでは<b>カメラ・位置情報・センサーの許可</b>が必要です。<br />
+      <ul style="margin: 8px 0 0 20px">
+        <li>「カメラ起動」ボタンを<b>必ずタップ</b>してください。</li>
+        <li>
+          iPhoneの方<br />
+          1. 設定→Safari→カメラ/位置情報→<b>許可</b><br />
+          2. アドレスバー左「AA」→Webサイトの設定→カメラ/位置情報→<b>許可</b>
+        </li>
+        <li>Androidの方：画面下の許可ダイアログを<b>許可</b>してください。</li>
+        <li>動作しない場合はリロードや端末の再起動をお試しください。</li>
+      </ul>
+      <button id="start-ar-btn">カメラ起動</button>
+    </div>
+    <div id="ar-main" style="width: 100vw; height: 100vh">
+      <div id="label" class="ar-label" style="display: none"></div>
+      <!-- ▼CSS製矢印（北向きが基準。clip-pathでV字凹み型） -->
+      <div id="arrow" class="arrow-v">
+        <div class="arrow-v-shape"></div>
+      </div>
+      <div id="info-panel" class="ar-info-panel" style="display: none">
+        <div class="row" id="row-name"></div>
+        <div class="row" id="row-distance">
+          距離: <b id="distance-val">--</b>
+        </div>
+        <div class="row" id="row-elev"></div>
+        <div class="row" id="row-turns"></div>
+        <div class="row" id="row-supplies"></div>
+        <div class="row" id="row-crowd"></div>
+      </div>
+      <a-scene
+        embedded
+        vr-mode-ui="enabled: false"
+        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
+        renderer="logarithmicDepthBuffer: true;"
+        device-orientation-permission-ui="enabled: true"
+      >
+        <a-camera gps-camera rotation-reader></a-camera>
+      </a-scene>
+    </div>
+    <script>
+      function getParam(name) {
+        const url = new URL(window.location.href);
+        return url.searchParams.get(name);
+      }
+      const shelterLat = parseFloat(getParam("lat"));
+      const shelterLng = parseFloat(getParam("lng"));
+      const shelterName = getParam("name") || "避難所";
+      const turns = getParam("turns");
+      let elevShelter = getParam("elev");
+      elevShelter =
+        elevShelter &&
+        elevShelter !== "null" &&
+        elevShelter !== "undefined" &&
+        elevShelter !== ""
+          ? isNaN(parseFloat(elevShelter))
+            ? elevShelter
+            : parseFloat(elevShelter).toFixed(1)
+          : "--";
+      let supplies = getParam("supplies");
+      let crowd = getParam("crowd");
+      supplies =
+        !supplies || supplies === "null" || supplies === "undefined"
+          ? "--"
+          : supplies;
+      crowd =
+        !crowd || crowd === "null" || crowd === "undefined" ? "--" : crowd;
+      async function requestSensorPermissionIfNeeded() {
+        let requested = false;
+        if (
+          typeof DeviceMotionEvent !== "undefined" &&
+          typeof DeviceMotionEvent.requestPermission === "function"
+        ) {
+          try {
+            await DeviceMotionEvent.requestPermission();
+            requested = true;
+          } catch (e) {}
         }
-        if (typeof heading === "number") {
-          currentHeading = heading;
+        if (
+          typeof DeviceOrientationEvent !== "undefined" &&
+          typeof DeviceOrientationEvent.requestPermission === "function"
+        ) {
+          try {
+            await DeviceOrientationEvent.requestPermission();
+            requested = true;
+          } catch (e) {}
+        }
+        return requested;
+      }
+      document.getElementById("start-ar-btn").onclick = async function () {
+        await requestSensorPermissionIfNeeded();
+        document.getElementById("guide-section").style.display = "none";
+        document.getElementById("ar-main").style.display = "block";
+        setupAR();
+      };
+      function setupAR() {
+        const label = document.getElementById("label");
+        label.innerText = `${shelterName} 方向`;
+        label.style.display = "block";
+        const infoPanel = document.getElementById("info-panel");
+        infoPanel.style.display = "block";
+        document.getElementById("row-name").innerHTML = shelterName
+          ? `🏫 <b>${shelterName}</b>`
+          : "";
+        document.getElementById("row-elev").innerHTML =
+          elevShelter && elevShelter !== "--"
+            ? `⛰️ 標高: <b>${elevShelter} m</b>`
+            : "";
+        document.getElementById("row-turns").innerHTML =
+          turns && turns !== "" && turns !== "null" && turns !== "undefined"
+            ? `🔄 曲がり角数: <b>${turns}</b>`
+            : "";
+        document.getElementById("row-supplies").innerHTML =
+          `🛒 必要物資: <b>${supplies}</b>`;
+        document.getElementById("row-crowd").innerHTML =
+          `👥 混雑度: <b>${crowd}</b>`;
+        const scene = document.querySelector("a-scene");
+        const marker = document.createElement("a-entity");
+        marker.setAttribute(
+          "gps-entity-place",
+          `latitude: ${shelterLat}; longitude: ${shelterLng};`,
+        );
+        marker.setAttribute("look-at", "[gps-camera]");
+        marker.setAttribute(
+          "geometry",
+          "primitive: cone; height: 8; radiusBottom: 2.2; radiusTop: 0.15;",
+        );
+        marker.setAttribute("material", "color: #9b2fff; opacity: 0.93");
+        marker.setAttribute("scale", "2.2 2.2 2.2");
+        const text = document.createElement("a-text");
+        text.setAttribute("value", shelterName);
+        text.setAttribute("color", "#fff");
+        text.setAttribute("align", "center");
+        text.setAttribute("position", "0 5 0");
+        text.setAttribute("width", "18");
+        marker.appendChild(text);
+        scene.appendChild(marker);
+        const arrow = document.getElementById("arrow");
+        arrow.style.display = "block";
+        let currentLat = null,
+          currentLng = null,
+          currentHeading = 0;
+        window.addEventListener("gps-camera-update-position", function (e) {
+          currentLat = e.detail.position.latitude;
+          currentLng = e.detail.position.longitude;
           updateArrow();
+          updateDistance();
+        });
+        function onOrientation(event) {
+          let heading = null;
+          if (typeof event.webkitCompassHeading === "number") {
+            heading = event.webkitCompassHeading;
+          } else if (typeof event.alpha === "number") {
+            heading = 360 - event.alpha;
+          }
+          if (typeof heading === "number") {
+            currentHeading = heading;
+            updateArrow();
+          }
+        }
+        window.addEventListener(
+          "deviceorientationabsolute",
+          onOrientation,
+          true,
+        );
+        window.addEventListener("deviceorientation", onOrientation, true);
+        function updateDistance() {
+          if (currentLat && currentLng && shelterLat && shelterLng) {
+            const dist = calcDistance(
+              currentLat,
+              currentLng,
+              shelterLat,
+              shelterLng,
+            );
+            document.getElementById("distance-val").innerText =
+              dist >= 1
+                ? `${dist.toFixed(2)} km`
+                : `${Math.round(dist * 1000)} m`;
+          }
+        }
+        function getBearing(lat1, lng1, lat2, lng2) {
+          const toRad = (x) => (x * Math.PI) / 180;
+          const y = Math.sin(toRad(lng2 - lng1)) * Math.cos(toRad(lat2));
+          const x =
+            Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) -
+            Math.sin(toRad(lat1)) *
+              Math.cos(toRad(lat2)) *
+              Math.cos(toRad(lng2 - lng1));
+          let brng = (Math.atan2(y, x) * 180) / Math.PI;
+          brng = (brng + 360) % 360;
+          return brng;
+        }
+        function updateArrow() {
+          if (currentLat && currentLng && typeof currentHeading === "number") {
+            const bearing = getBearing(
+              currentLat,
+              currentLng,
+              shelterLat,
+              shelterLng,
+            );
+            const diff = (bearing - currentHeading + 360) % 360;
+            const arrowEl = document.getElementById("arrow");
+            // 北が0度基準なので、そのまま回転でOK
+            arrowEl.style.transform = `translate(-50%, -50%) rotate(${diff}deg)`;
+          }
+        }
+        function calcDistance(lat1, lng1, lat2, lng2) {
+          function toRad(x) {
+            return (x * Math.PI) / 180;
+          }
+          const R = 6371; // km
+          const dLat = toRad(lat2 - lat1);
+          const dLon = toRad(lng2 - lng1);
+          const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRad(lat1)) *
+              Math.cos(toRad(lat2)) *
+              Math.sin(dLon / 2) *
+              Math.sin(dLon / 2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+          return R * c;
         }
       }
-      window.addEventListener("deviceorientationabsolute", onOrientation, true);
-      window.addEventListener("deviceorientation", onOrientation, true);
-      function updateDistance() {
-        if (currentLat && currentLng && shelterLat && shelterLng) {
-          const dist = calcDistance(currentLat, currentLng, shelterLat, shelterLng);
-          document.getElementById('distance-val').innerText =
-            dist >= 1 ? `${dist.toFixed(2)} km` : `${Math.round(dist * 1000)} m`;
-        }
-      }
-      function getBearing(lat1, lng1, lat2, lng2) {
-        const toRad = x => x * Math.PI / 180;
-        const y = Math.sin(toRad(lng2 - lng1)) * Math.cos(toRad(lat2));
-        const x =
-          Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) -
-          Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) *
-          Math.cos(toRad(lng2 - lng1));
-        let brng = Math.atan2(y, x) * 180 / Math.PI;
-        brng = (brng + 360) % 360;
-        return brng;
-      }
-      function updateArrow() {
-        if (currentLat && currentLng && typeof currentHeading === "number") {
-          const bearing = getBearing(currentLat, currentLng, shelterLat, shelterLng);
-          const diff = ((bearing - currentHeading + 360) % 360);
-          const arrowEl = document.getElementById('arrow');
-          // 北が0度基準なので、そのまま回転でOK
-          arrowEl.style.transform = `translate(-50%, -50%) rotate(${diff}deg)`;
-        }
-      }
-      function calcDistance(lat1, lng1, lat2, lng2) {
-        function toRad(x) { return x * Math.PI / 180; }
-        const R = 6371; // km
-        const dLat = toRad(lat2-lat1);
-        const dLon = toRad(lng2-lng1);
-        const a =
-          Math.sin(dLat/2) * Math.sin(dLat/2) +
-          Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-          Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
-      }
-    }
-  </script>
-</body>
+    </script>
+  </body>
 </html>

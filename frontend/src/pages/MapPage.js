@@ -11,7 +11,7 @@ export default function MapPage() {
 
   const handleRangeChange = ([from, to]) => {
     fetch(`/api/disaster_situations?start_date=${from}&end_date=${to}`)
-      .then(res => res.json())
+      .then((res) => res.json())
       .then(setDisasterData);
   };
 

@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { fetchPrefs, fetchCities, fetchHazardPolygonsByCity } from "./utils/fetchHazardPolygons.js";
+import {
+  fetchPrefs,
+  fetchCities,
+  fetchHazardPolygonsByCity,
+} from "./utils/fetchHazardPolygons.js";
 
 export default function PolygonSearch({ onPolygonsFetched }) {
   const [prefs, setPrefs] = useState([]);
@@ -35,16 +39,31 @@ export default function PolygonSearch({ onPolygonsFetched }) {
     <div>
       <label>
         都道府県：
-        <select value={selectedPref} onChange={e => setSelectedPref(e.target.value)}>
+        <select
+          value={selectedPref}
+          onChange={(e) => setSelectedPref(e.target.value)}
+        >
           <option value="">都道府県を選択</option>
-          {prefs.map(pref => <option key={pref} value={pref}>{pref}</option>)}
+          {prefs.map((pref) => (
+            <option key={pref} value={pref}>
+              {pref}
+            </option>
+          ))}
         </select>
       </label>
       <label>
         市町村：
-        <select value={selectedCity} onChange={e => setSelectedCity(e.target.value)} disabled={!selectedPref}>
+        <select
+          value={selectedCity}
+          onChange={(e) => setSelectedCity(e.target.value)}
+          disabled={!selectedPref}
+        >
           <option value="">市町村を選択</option>
-          {cities.map(city => <option key={city} value={city}>{city}</option>)}
+          {cities.map((city) => (
+            <option key={city} value={city}>
+              {city}
+            </option>
+          ))}
         </select>
       </label>
       <button onClick={handleSearch} disabled={!selectedCity || loading}>

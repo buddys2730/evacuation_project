@@ -4,11 +4,15 @@ const JS_PATH = "./src/components/ShelterReview.js";
 
 // mdファイルからprops抽出
 const md = fs.readFileSync(MD_PATH, "utf-8");
-const mdPropRows = md.split("\n").filter(line => /^\|\s*`[^`]+`\s*\|/.test(line));
-const mdProps = mdPropRows.map(line => {
-  const match = line.match(/^\|\s*`([^`]+)`/);
-  return match ? match[1] : null;
-}).filter(Boolean);
+const mdPropRows = md
+  .split("\n")
+  .filter((line) => /^\|\s*`[^`]+`\s*\|/.test(line));
+const mdProps = mdPropRows
+  .map((line) => {
+    const match = line.match(/^\|\s*`([^`]+)`/);
+    return match ? match[1] : null;
+  })
+  .filter(Boolean);
 
 const js = fs.readFileSync(JS_PATH, "utf-8");
 const lines = js.split("\n");

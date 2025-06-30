@@ -2,7 +2,7 @@
 import React from "react";
 export default function DangerLevelSelect({ value, onChange }) {
   return (
-    <select value={value} onChange={e => onChange(e.target.value)}>
+    <select value={value} onChange={(e) => onChange(e.target.value)}>
       <option value="">危険度選択</option>
       <option value="高">高</option>
       <option value="中">中</option>

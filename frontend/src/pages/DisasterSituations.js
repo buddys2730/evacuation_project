@@ -24,7 +24,7 @@ const DisasterSituations = () => {
   useEffect(() => {
     if (!playing) {
       fetch(
-        `${API_BASE}/api/disaster_situations?start_date=${range[0]}&end_date=${range[1]}`
+        `${API_BASE}/api/disaster_situations?start_date=${range[0]}&end_date=${range[1]}`,
       )
         .then((res) => res.json())
         .then((data) => {

@@ -1,5 +1,12 @@
 // frontend/src/api/disasterSituations.js
-export async function fetchDisasterSituations({ pref, city, disasterType, dangerLevel, from, to }) {
+export async function fetchDisasterSituations({
+  pref,
+  city,
+  disasterType,
+  dangerLevel,
+  from,
+  to,
+}) {
   const params = new URLSearchParams();
   if (pref) params.append("pref", pref);
   if (city) params.append("city", city);
@@ -8,7 +15,10 @@ export async function fetchDisasterSituations({ pref, city, disasterType, danger
   if (from) params.append("from", from);
   if (to) params.append("to", to);
 
-  const url = process.env.REACT_APP_API_BASE_URL + "/admin/disaster-situations?" + params.toString();
+  const url =
+    process.env.REACT_APP_API_BASE_URL +
+    "/admin/disaster-situations?" +
+    params.toString();
   const res = await fetch(url);
   return await res.json();
 }

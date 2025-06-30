@@ -23,9 +23,14 @@ const ShelterReview = ({ shelterId, onSubmit, initialValue }) => {
     <form className="shelter-review" onSubmit={handleSubmit}>
       <label>
         評価:
-        <select value={rating} onChange={e => setRating(Number(e.target.value))}>
+        <select
+          value={rating}
+          onChange={(e) => setRating(Number(e.target.value))}
+        >
           {[1, 2, 3, 4, 5].map((val) => (
-            <option key={val} value={val}>{val}</option>
+            <option key={val} value={val}>
+              {val}
+            </option>
           ))}
         </select>
       </label>
@@ -33,7 +38,7 @@ const ShelterReview = ({ shelterId, onSubmit, initialValue }) => {
         レビュー:
         <textarea
           value={review}
-          onChange={e => setReview(e.target.value)}
+          onChange={(e) => setReview(e.target.value)}
           rows={3}
         />
       </label>

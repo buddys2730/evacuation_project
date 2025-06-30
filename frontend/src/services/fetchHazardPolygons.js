@@ -17,33 +17,37 @@ export async function fetchHazardPolygons(
   lng,
   radiusKm,
   prefecture,
-  mode = "hazard"
+  mode = "hazard",
 ) {
   // 「現在の災害状況」モードなら別APIに切り替え
   if (mode === "disaster") {
     console.log("[API呼び出し] /api/disaster_situations/active");
-    const res = await axios.get(`${config.API_BASE_URL}/api/disaster_situations/active`);
+    const res = await axios.get(
+      `${config.API_BASE_URL}/api/disaster_situations/active`,
+    );
     // 取得件数の統一ログ
     const features = Array.isArray(res.data?.features)
       ? res.data.features
       : Array.isArray(res.data)
-      ? res.data
-      : [];
+        ? res.data
+        : [];
     console.log("[取得件数]", features.length);
     return res.data;
   }
 
   // 通常ハザードモード
   const category =
-    Array.isArray(categories) && categories.length > 0 ? categories[0] : categories;
+    Array.isArray(categories) && categories.length > 0
+      ? categories[0]
+      : categories;
 
   // ここでエンコードは不要！
   const params = {
-    category,    // ← そのまま
+    category, // ← そのまま
     lat,
     lng,
     radius_km: radiusKm,
-    prefecture,  // ← そのまま
+    prefecture, // ← そのまま
     mode,
   };
 
@@ -55,10 +59,9 @@ export async function fetchHazardPolygons(
   });
 
   // 統一的に「features」もしくは素配列の件数をログ表示
-  const features =
-    Array.isArray(res.data?.features)
-      ? res.data.features
-      : Array.isArray(res.data)
+  const features = Array.isArray(res.data?.features)
+    ? res.data.features
+    : Array.isArray(res.data)
       ? res.data
       : [];
   console.log("[取得件数]", features.length);

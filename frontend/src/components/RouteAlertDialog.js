@@ -9,14 +9,22 @@ const statusColor = {
   blocked: "#FF3B30",
 };
 
-export default function RouteAlertDialog({ open, onClose, recommendation, status }) {
+export default function RouteAlertDialog({
+  open,
+  onClose,
+  recommendation,
+  status,
+}) {
   if (!open) return null;
 
   return (
     <div
       style={{
         position: "fixed",
-        top: 0, left: 0, right: 0, bottom: 0,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
         background: "rgba(0,0,0,0.3)",
         zIndex: 9999,
         display: "flex",
@@ -35,16 +43,16 @@ export default function RouteAlertDialog({ open, onClose, recommendation, status
           textAlign: "center",
           borderTop: `8px solid ${statusColor[status] || "#aaa"}`,
         }}
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         <h3 style={{ color: statusColor[status] || "#333" }}>
           {status === "safe"
             ? "安全なルートです"
             : status === "danger"
-            ? "要注意ルート"
-            : status === "blocked"
-            ? "通行止め"
-            : "ルート情報"}
+              ? "要注意ルート"
+              : status === "blocked"
+                ? "通行止め"
+                : "ルート情報"}
         </h3>
         <div style={{ fontSize: "1.1em", margin: "1em 0" }}>
           {recommendation}

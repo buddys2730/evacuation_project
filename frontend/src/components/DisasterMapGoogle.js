@@ -7,7 +7,7 @@ export default function DisasterMapGoogle({
   polygons = [],
   selectedId,
   onPolygonClick,
-  onPolygonChange
+  onPolygonChange,
 }) {
   const mapRef = useRef();
   const mapInstance = useRef(null);
@@ -30,31 +30,35 @@ export default function DisasterMapGoogle({
         mapInstance.current = new window.google.maps.Map(mapRef.current, {
           center,
           zoom: 12,
-          mapTypeId: "roadmap"
+          mapTypeId: "roadmap",
         });
 
-        drawingManagerRef.current = new window.google.maps.drawing.DrawingManager({
-          drawingMode: window.google.maps.drawing.OverlayType.POLYGON,
-          drawingControl: true,
-          drawingControlOptions: {
-            position: window.google.maps.ControlPosition.TOP_CENTER,
-            drawingModes: ["polygon"],
-          },
-          polygonOptions: {
-            fillColor: "#ff3333",
-            fillOpacity: 0.25,
-            strokeWeight: 2,
-            editable: true,
-            draggable: false,
-          },
-        });
+        drawingManagerRef.current =
+          new window.google.maps.drawing.DrawingManager({
+            drawingMode: window.google.maps.drawing.OverlayType.POLYGON,
+            drawingControl: true,
+            drawingControlOptions: {
+              position: window.google.maps.ControlPosition.TOP_CENTER,
+              drawingModes: ["polygon"],
+            },
+            polygonOptions: {
+              fillColor: "#ff3333",
+              fillOpacity: 0.25,
+              strokeWeight: 2,
+              editable: true,
+              draggable: false,
+            },
+          });
         drawingManagerRef.current.setMap(mapInstance.current);
 
         window.google.maps.event.addListener(
           drawingManagerRef.current,
           "polygoncomplete",
           function (polygon) {
-            const path = polygon.getPath().getArray().map(({ lat, lng }) => [lng(), lat()]);
+            const path = polygon
+              .getPath()
+              .getArray()
+              .map(({ lat, lng }) => [lng(), lat()]);
             path.push(path[0]);
             const geojson = {
               type: "Polygon",
@@ -62,14 +66,14 @@ export default function DisasterMapGoogle({
             };
             if (onPolygonChange) onPolygonChange(geojson);
             polygon.setEditable(false);
-          }
+          },
         );
       }
     }
 
     return () => {
       if (drawingManagerRef.current) drawingManagerRef.current.setMap(null);
-      polygonsRef.current.forEach(p => p.setMap(null));
+      polygonsRef.current.forEach((p) => p.setMap(null));
     };
     // eslint-disable-next-line
   }, []);
@@ -83,8 +87,8 @@ export default function DisasterMapGoogle({
   // ポリゴン描画＆クリック連携
   useEffect(() => {
     if (!mapInstance.current) return;
-    polygonsRef.current.forEach(p => p.setMap(null));
-    polygonsRef.current = polygons.map(geojson => {
+    polygonsRef.current.forEach((p) => p.setMap(null));
+    polygonsRef.current = polygons.map((geojson) => {
       const paths = geojson.coordinates[0].map(([lng, lat]) => ({ lat, lng }));
       const isSelected = geojson.id && geojson.id === selectedId;
       const isCleared = geojson.isCleared;
@@ -112,7 +116,9 @@ export default function DisasterMapGoogle({
         map: mapInstance.current,
       });
       if (geojson.id && onPolygonClick) {
-        window.google.maps.event.addListener(poly, "click", () => onPolygonClick(geojson.id));
+        window.google.maps.event.addListener(poly, "click", () =>
+          onPolygonClick(geojson.id),
+        );
       }
       return poly;
     });
@@ -120,7 +126,15 @@ export default function DisasterMapGoogle({
 
   return (
     <div>
-      <div ref={mapRef} style={{ width: "100%", height: 420, borderRadius: 8, border: "1px solid #aaa" }} />
+      <div
+        ref={mapRef}
+        style={{
+          width: "100%",
+          height: 420,
+          borderRadius: 8,
+          border: "1px solid #aaa",
+        }}
+      />
     </div>
   );
 }

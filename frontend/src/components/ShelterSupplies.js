@@ -9,7 +9,7 @@ const ShelterSupplies = ({ shelterId, supplies = [], onUpdate }) => {
 
   const handleChange = (idx, field, value) => {
     const updated = localSupplies.map((s, i) =>
-      i === idx ? { ...s, [field]: value } : s
+      i === idx ? { ...s, [field]: value } : s,
     );
     setLocalSupplies(updated);
     onUpdate && onUpdate(updated);
@@ -30,7 +30,7 @@ const ShelterSupplies = ({ shelterId, supplies = [], onUpdate }) => {
               <td>
                 <input
                   value={s.item}
-                  onChange={e => handleChange(idx, "item", e.target.value)}
+                  onChange={(e) => handleChange(idx, "item", e.target.value)}
                   disabled={!onUpdate}
                 />
               </td>
@@ -38,7 +38,9 @@ const ShelterSupplies = ({ shelterId, supplies = [], onUpdate }) => {
                 <input
                   type="number"
                   value={s.quantity}
-                  onChange={e => handleChange(idx, "quantity", e.target.value)}
+                  onChange={(e) =>
+                    handleChange(idx, "quantity", e.target.value)
+                  }
                   disabled={!onUpdate}
                 />
               </td>

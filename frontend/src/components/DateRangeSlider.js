@@ -5,8 +5,7 @@ import dayjs from "dayjs";
 import PropTypes from "prop-types";
 
 // ユーティリティ
-const dateToNum = (date, minDate) =>
-  dayjs(date).diff(dayjs(minDate), "day");
+const dateToNum = (date, minDate) => dayjs(date).diff(dayjs(minDate), "day");
 const numToDate = (num, minDate) =>
   dayjs(minDate).add(num, "day").format("YYYY-MM-DD");
 

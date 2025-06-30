@@ -9,16 +9,14 @@ function geoJsonToPaths(geojson) {
   if (!geojson) return [];
   if (geojson.type === "Polygon") {
     // [[ [lng, lat], ... ]] -> [ [ {lat, lng}, ... ] ]
-    return geojson.coordinates.map(
-      (ring) => ring.map(([lng, lat]) => ({ lat, lng }))
+    return geojson.coordinates.map((ring) =>
+      ring.map(([lng, lat]) => ({ lat, lng })),
     );
   }
   if (geojson.type === "MultiPolygon") {
     // [ [ [ [lng, lat], ... ] ], ... ] -> flat
-    return geojson.coordinates.flatMap(
-      (polygon) => polygon.map(
-        (ring) => ring.map(([lng, lat]) => ({ lat, lng }))
-      )
+    return geojson.coordinates.flatMap((polygon) =>
+      polygon.map((ring) => ring.map(([lng, lat]) => ({ lat, lng }))),
     );
   }
   return [];
@@ -28,7 +26,11 @@ const HazardPolygonRenderer = ({ polygons }) => {
   // -- データの入れ方に完全対応 --
   let features = [];
   // FeatureCollection形式の場合
-  if (polygons && polygons.type === "FeatureCollection" && Array.isArray(polygons.features)) {
+  if (
+    polygons &&
+    polygons.type === "FeatureCollection" &&
+    Array.isArray(polygons.features)
+  ) {
     features = polygons.features;
   }
   // 配列形式（従来のまま）の場合
@@ -77,7 +79,7 @@ const HazardPolygonRenderer = ({ polygons }) => {
 HazardPolygonRenderer.propTypes = {
   polygons: PropTypes.oneOfType([
     PropTypes.array, // [{geometry, properties}, ...]
-    PropTypes.object // {type:"FeatureCollection", features:[...]}
+    PropTypes.object, // {type:"FeatureCollection", features:[...]}
   ]).isRequired,
 };
 

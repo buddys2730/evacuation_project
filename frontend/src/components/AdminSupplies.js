@@ -6,14 +6,24 @@ export default function AdminSupplies() {
 
   useEffect(() => {
     fetch(`${API_BASE}/api/admin/supplies`)
-      .then(r => r.json())
-      .then(data => setSupplies(Array.isArray(data) ? data : []));
+      .then((r) => r.json())
+      .then((data) => setSupplies(Array.isArray(data) ? data : []));
   }, []);
 
   return (
     <div style={{ padding: 32, fontFamily: "sans-serif" }}>
       <h2>必要物資管理ページ</h2>
-      <table border={1} cellPadding={6} cellSpacing={0} style={{ borderCollapse: "collapse", width: "100%", minWidth: 850, background: "#fafcff" }}>
+      <table
+        border={1}
+        cellPadding={6}
+        cellSpacing={0}
+        style={{
+          borderCollapse: "collapse",
+          width: "100%",
+          minWidth: 850,
+          background: "#fafcff",
+        }}
+      >
         <thead style={{ background: "#e3ecfc" }}>
           <tr>
             <th>避難所名</th>
@@ -24,7 +34,7 @@ export default function AdminSupplies() {
           </tr>
         </thead>
         <tbody>
-          {supplies.map(s => (
+          {supplies.map((s) => (
             <tr key={s.id}>
               <td>{s.shelter_name}</td>
               <td>{s.item_name}</td>

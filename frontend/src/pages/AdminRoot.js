@@ -11,9 +11,10 @@ export default function AdminRoot() {
           onClick={() => setTab("shelter")}
           style={{
             fontWeight: tab === "shelter" ? "bold" : undefined,
-            borderBottom: tab === "shelter" ? "3px solid #005edc" : "1px solid #ccc",
+            borderBottom:
+              tab === "shelter" ? "3px solid #005edc" : "1px solid #ccc",
             background: tab === "shelter" ? "#e8f0ff" : "#fff",
-            padding: "10px 24px"
+            padding: "10px 24px",
           }}
         >
           避難所管理
@@ -22,9 +23,10 @@ export default function AdminRoot() {
           onClick={() => setTab("disaster")}
           style={{
             fontWeight: tab === "disaster" ? "bold" : undefined,
-            borderBottom: tab === "disaster" ? "3px solid #d44" : "1px solid #ccc",
+            borderBottom:
+              tab === "disaster" ? "3px solid #d44" : "1px solid #ccc",
             background: tab === "disaster" ? "#fff0f0" : "#fff",
-            padding: "10px 24px"
+            padding: "10px 24px",
           }}
         >
           災害状況管理

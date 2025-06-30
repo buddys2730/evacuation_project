@@ -15,7 +15,9 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL;
 function EditDisasterModal({ open, disaster, onSave, onClose }) {
   const [dangerLevel, setDangerLevel] = useState(disaster?.danger_level || "");
   const [comment, setComment] = useState(disaster?.comment || "");
-  const [clearedAt, setClearedAt] = useState(disaster?.cleared_at ? disaster.cleared_at.slice(0, 10) : "");
+  const [clearedAt, setClearedAt] = useState(
+    disaster?.cleared_at ? disaster.cleared_at.slice(0, 10) : "",
+  );
 
   useEffect(() => {
     setDangerLevel(disaster?.danger_level || "");
@@ -36,17 +38,41 @@ function EditDisasterModal({ open, disaster, onSave, onClose }) {
   }
 
   return (
-    <div style={{
-      position: "fixed", left: 0, top: 0, width: "100vw", height: "100vh",
-      background: "rgba(0,0,0,0.25)", zIndex: 3000, display: "flex", alignItems: "center", justifyContent: "center"
-    }}>
-      <div style={{ background: "#fff", padding: 24, borderRadius: 12, minWidth: 340, maxWidth: 500 }}>
+    <div
+      style={{
+        position: "fixed",
+        left: 0,
+        top: 0,
+        width: "100vw",
+        height: "100vh",
+        background: "rgba(0,0,0,0.25)",
+        zIndex: 3000,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <div
+        style={{
+          background: "#fff",
+          padding: 24,
+          borderRadius: 12,
+          minWidth: 340,
+          maxWidth: 500,
+        }}
+      >
         <h3>災害情報 編集</h3>
-        <div>種別：<b>{disaster.disaster_type}</b></div>
+        <div>
+          種別：<b>{disaster.disaster_type}</b>
+        </div>
         <div>住所：{disaster.address_label}</div>
         <div style={{ margin: "10px 0" }}>
           危険度:
-          <select value={dangerLevel} onChange={e => setDangerLevel(e.target.value)} style={{ marginLeft: 8 }}>
+          <select
+            value={dangerLevel}
+            onChange={(e) => setDangerLevel(e.target.value)}
+            style={{ marginLeft: 8 }}
+          >
             <option value="">未設定</option>
             <option value="高">高</option>
             <option value="中">中</option>
@@ -54,10 +80,11 @@ function EditDisasterModal({ open, disaster, onSave, onClose }) {
           </select>
         </div>
         <div style={{ margin: "10px 0" }}>
-          コメント:<br />
+          コメント:
+          <br />
           <input
             value={comment}
-            onChange={e => setComment(e.target.value)}
+            onChange={(e) => setComment(e.target.value)}
             style={{ width: "95%" }}
           />
         </div>
@@ -66,12 +93,14 @@ function EditDisasterModal({ open, disaster, onSave, onClose }) {
           <input
             type="date"
             value={clearedAt}
-            onChange={e => setClearedAt(e.target.value)}
+            onChange={(e) => setClearedAt(e.target.value)}
             style={{ marginLeft: 8 }}
           />
         </div>
         <div style={{ marginTop: 14, textAlign: "right" }}>
-          <button onClick={handleSave} style={{ marginRight: 10 }}>保存</button>
+          <button onClick={handleSave} style={{ marginRight: 10 }}>
+            保存
+          </button>
           <button onClick={onClose}>キャンセル</button>
         </div>
       </div>
@@ -109,9 +138,11 @@ export default function DisasterSituationDashboard() {
 
   useEffect(() => {
     if (pref && city) {
-      fetch(`${API_BASE}/api/city-center?pref=${encodeURIComponent(pref)}&city=${encodeURIComponent(city)}`)
-        .then(res => res.json())
-        .then(data => {
+      fetch(
+        `${API_BASE}/api/city-center?pref=${encodeURIComponent(pref)}&city=${encodeURIComponent(city)}`,
+      )
+        .then((res) => res.json())
+        .then((data) => {
           if (data && data.lat && data.lng) {
             setCenter({ lat: data.lat, lng: data.lng });
           }
@@ -119,16 +150,20 @@ export default function DisasterSituationDashboard() {
     }
   }, [pref, city]);
 
-  useEffect(() => { setCity(""); }, [pref]);
+  useEffect(() => {
+    setCity("");
+  }, [pref]);
 
   // スライダーの範囲で災害状況を取得
   useEffect(() => {
     setLoading(true);
     setError("");
     const [from, to] = sliderRange;
-    fetch(`${API_BASE}/api/disaster_situations?start_date=${from}&end_date=${to}`)
-      .then(res => res.json())
-      .then(data => setDisasters(Array.isArray(data) ? data : []))
+    fetch(
+      `${API_BASE}/api/disaster_situations?start_date=${from}&end_date=${to}`,
+    )
+      .then((res) => res.json())
+      .then((data) => setDisasters(Array.isArray(data) ? data : []))
       .catch(() => setError("データ取得に失敗しました"))
       .finally(() => setLoading(false));
   }, [sliderRange]);
@@ -153,10 +188,10 @@ export default function DisasterSituationDashboard() {
         depth_m: depthM ? parseFloat(depthM) : null,
         occurred_at: occurredAt,
         comment,
-        image_url: imageUrl
-      })
+        image_url: imageUrl,
+      }),
     })
-      .then(res => {
+      .then((res) => {
         if (!res.ok) throw new Error();
         return res.json();
       })
@@ -165,9 +200,11 @@ export default function DisasterSituationDashboard() {
         setError("");
         // 再取得
         const [from, to] = sliderRange;
-        return fetch(`${API_BASE}/api/disaster_situations?start_date=${from}&end_date=${to}`)
-          .then(res => res.json())
-          .then(data => setDisasters(Array.isArray(data) ? data : []));
+        return fetch(
+          `${API_BASE}/api/disaster_situations?start_date=${from}&end_date=${to}`,
+        )
+          .then((res) => res.json())
+          .then((data) => setDisasters(Array.isArray(data) ? data : []));
       })
       .catch(() => setError("登録に失敗しました"))
       .finally(() => setLoading(false));
@@ -179,23 +216,23 @@ export default function DisasterSituationDashboard() {
   };
 
   // カードまたは地図から選択
-  const handleSelect = id => setSelectedId(id);
+  const handleSelect = (id) => setSelectedId(id);
 
   // 編集ボタン押下
-  const handleEdit = disaster => {
+  const handleEdit = (disaster) => {
     setEditTarget(disaster);
     setEditModalOpen(true);
   };
 
   // 編集保存
-  const handleEditSave = updated => {
+  const handleEditSave = (updated) => {
     setLoading(true);
     fetch(`${API_BASE}/api/disaster_situations/${updated.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updated),
     })
-      .then(res => {
+      .then((res) => {
         if (!res.ok) throw new Error();
         return res.json();
       })
@@ -205,24 +242,26 @@ export default function DisasterSituationDashboard() {
         setEditTarget(null);
         // 再取得
         const [from, to] = sliderRange;
-        return fetch(`${API_BASE}/api/disaster_situations?start_date=${from}&end_date=${to}`)
-          .then(res => res.json())
-          .then(data => setDisasters(Array.isArray(data) ? data : []));
+        return fetch(
+          `${API_BASE}/api/disaster_situations?start_date=${from}&end_date=${to}`,
+        )
+          .then((res) => res.json())
+          .then((data) => setDisasters(Array.isArray(data) ? data : []));
       })
       .catch(() => setError("更新に失敗しました"))
       .finally(() => setLoading(false));
   };
 
   // 地図側でポリゴンが選択された場合
-  const handlePolygonSelect = id => setSelectedId(id);
+  const handlePolygonSelect = (id) => setSelectedId(id);
 
   return (
     <div style={{ padding: 32, fontFamily: "sans-serif" }}>
       <h2>災害状況管理（タイムスライダー/履歴・CSV出力対応）</h2>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-        <PrefSelect value={pref} onChange={v => setPref(v)} />
-        <CitySelect pref={pref} value={city} onChange={v => setCity(v)} />
+        <PrefSelect value={pref} onChange={(v) => setPref(v)} />
+        <CitySelect pref={pref} value={city} onChange={(v) => setCity(v)} />
         <DisasterTypeSelect value={disasterType} onChange={setDisasterType} />
         <DangerLevelSelect value={dangerLevel} onChange={setDangerLevel} />
         <input
@@ -230,28 +269,39 @@ export default function DisasterSituationDashboard() {
           step="0.01"
           placeholder="水深(m)"
           value={depthM}
-          onChange={e => setDepthM(e.target.value)}
+          onChange={(e) => setDepthM(e.target.value)}
           style={{ width: 80 }}
         />
         <input
           type="date"
           value={occurredAt}
-          onChange={e => setOccurredAt(e.target.value)}
+          onChange={(e) => setOccurredAt(e.target.value)}
         />
         <input
           type="text"
           placeholder="コメント"
           value={comment}
-          onChange={e => setComment(e.target.value)}
+          onChange={(e) => setComment(e.target.value)}
         />
         <input
           type="text"
           placeholder="画像URL"
           value={imageUrl}
-          onChange={e => setImageUrl(e.target.value)}
+          onChange={(e) => setImageUrl(e.target.value)}
         />
-        <button onClick={handleRegister} disabled={loading}>登録</button>
-        <ExportCsvButton filter={{ pref, city, disasterType, dangerLevel, from: sliderRange[0], to: sliderRange[1] }} />
+        <button onClick={handleRegister} disabled={loading}>
+          登録
+        </button>
+        <ExportCsvButton
+          filter={{
+            pref,
+            city,
+            disasterType,
+            dangerLevel,
+            from: sliderRange[0],
+            to: sliderRange[1],
+          }}
+        />
       </div>
 
       <div style={{ marginBottom: 24 }}>
@@ -270,14 +320,14 @@ export default function DisasterSituationDashboard() {
 
       <DisasterMapGoogle
         center={center}
-        polygons={disasters.filter(d => d.geometry).map(d =>
-          ({
+        polygons={disasters
+          .filter((d) => d.geometry)
+          .map((d) => ({
             ...d.geometry,
             id: d.id,
             selected: d.id === selectedId,
-            isCleared: !!d.cleared_at // 解除済み色分け用
-          })
-        )}
+            isCleared: !!d.cleared_at, // 解除済み色分け用
+          }))}
         selectedId={selectedId}
         onPolygonClick={handlePolygonSelect}
         onPolygonChange={handlePolygonChange}
@@ -294,7 +344,10 @@ export default function DisasterSituationDashboard() {
         open={editModalOpen}
         disaster={editTarget}
         onSave={handleEditSave}
-        onClose={() => { setEditModalOpen(false); setEditTarget(null); }}
+        onClose={() => {
+          setEditModalOpen(false);
+          setEditTarget(null);
+        }}
       />
     </div>
   );

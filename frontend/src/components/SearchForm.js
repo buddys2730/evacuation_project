@@ -5,15 +5,64 @@ import config from "../config.js";
 
 // 都道府県一覧
 const prefectures = [
-  "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県",
-  "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県",
-  "岐阜県", "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県",
-  "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県",
-  "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"
+  "北海道",
+  "青森県",
+  "岩手県",
+  "宮城県",
+  "秋田県",
+  "山形県",
+  "福島県",
+  "茨城県",
+  "栃木県",
+  "群馬県",
+  "埼玉県",
+  "千葉県",
+  "東京都",
+  "神奈川県",
+  "新潟県",
+  "富山県",
+  "石川県",
+  "福井県",
+  "山梨県",
+  "長野県",
+  "岐阜県",
+  "静岡県",
+  "愛知県",
+  "三重県",
+  "滋賀県",
+  "京都府",
+  "大阪府",
+  "兵庫県",
+  "奈良県",
+  "和歌山県",
+  "鳥取県",
+  "島根県",
+  "岡山県",
+  "広島県",
+  "山口県",
+  "徳島県",
+  "香川県",
+  "愛媛県",
+  "高知県",
+  "福岡県",
+  "佐賀県",
+  "長崎県",
+  "熊本県",
+  "大分県",
+  "宮崎県",
+  "鹿児島県",
+  "沖縄県",
 ];
 
 const disasterTypes = [
-  "洪水", "津波", "地震", "土砂", "高潮", "火山", "火事", "内水",
+  "洪水",
+  "津波",
+  "地震",
+  "土砂",
+  "高潮",
+  "火山",
+  "火事",
+  "内水",
 ];
 
 const floodDetailOptions = [
@@ -45,59 +94,60 @@ const SearchForm = ({
 
   // 都道府県変更時に市区町村リストを取得
   useEffect(() => {
-  if (!pref) {
-    setCityList([]);
-    setCity("");
-    return;
-  }
-  const fetchCities = async () => {
-    try {
-      // パラメータ名を「prefecture」に修正
-      const res = await axios.get(
-        `${config.API_BASE_URL}/api/cities?prefecture=${encodeURIComponent(pref)}`
-      );
-      // 返り値が cities でなく直接配列なら下の行だけ変更
-      const cityArray = Array.isArray(res.data.cities)
-        ? res.data.cities
-        : (Array.isArray(res.data) ? res.data : []);
-      setCityList(cityArray);
-      setCity("");
-    } catch (e) {
+    if (!pref) {
       setCityList([]);
       setCity("");
+      return;
     }
-  };
-  fetchCities();
-}, [pref]);
+    const fetchCities = async () => {
+      try {
+        // パラメータ名を「prefecture」に修正
+        const res = await axios.get(
+          `${config.API_BASE_URL}/api/cities?prefecture=${encodeURIComponent(pref)}`,
+        );
+        // 返り値が cities でなく直接配列なら下の行だけ変更
+        const cityArray = Array.isArray(res.data.cities)
+          ? res.data.cities
+          : Array.isArray(res.data)
+            ? res.data
+            : [];
+        setCityList(cityArray);
+        setCity("");
+      } catch (e) {
+        setCityList([]);
+        setCity("");
+      }
+    };
+    fetchCities();
+  }, [pref]);
 
   // 初期位置取得
   useEffect(() => {
-  console.log("=== getCurrentPosition useEffect発火 ===");
-  if (!navigator.geolocation) {
-    alert("このブラウザでは位置情報が取得できません。");
-    const fallback = { lat: 34.5436137, lng: 133.289872 };
-    setLocation(fallback);
-    setUserLocation(fallback);
-    return;
-  }
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-      console.log("[位置取得成功]", loc);
-      setLocation(loc);
-      setUserLocation(loc);
-    },
-    (err) => {
-      console.error("[位置取得失敗]", err);
-      alert("現在地の取得に失敗しました。デフォルト位置を使用します。");
+    console.log("=== getCurrentPosition useEffect発火 ===");
+    if (!navigator.geolocation) {
+      alert("このブラウザでは位置情報が取得できません。");
       const fallback = { lat: 34.5436137, lng: 133.289872 };
       setLocation(fallback);
       setUserLocation(fallback);
-    },
-    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-  );
-}, []); // 依存配列を[]に限定
-
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        console.log("[位置取得成功]", loc);
+        setLocation(loc);
+        setUserLocation(loc);
+      },
+      (err) => {
+        console.error("[位置取得失敗]", err);
+        alert("現在地の取得に失敗しました。デフォルト位置を使用します。");
+        const fallback = { lat: 34.5436137, lng: 133.289872 };
+        setLocation(fallback);
+        setUserLocation(fallback);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
+    );
+  }, []); // 依存配列を[]に限定
 
   const handleSearch = async () => {
     if (!pref || !city || !disasterType || !location) {
@@ -125,8 +175,9 @@ const SearchForm = ({
           shelter_type: shelterType,
         },
       });
-      const results =
-        Array.isArray(response.data) ? response.data : response.data.results || [];
+      const results = Array.isArray(response.data)
+        ? response.data
+        : response.data.results || [];
 
       onResults && onResults(results);
       onSearchParams &&
@@ -146,7 +197,7 @@ const SearchForm = ({
       alert(
         error?.response?.data?.error
           ? `検索失敗: ${error.response.data.error}`
-          : "検索に失敗しました。"
+          : "検索に失敗しました。",
       );
     } finally {
       setLoading(false);
@@ -161,7 +212,9 @@ const SearchForm = ({
         <select value={pref} onChange={(e) => setPref(e.target.value)}>
           <option value="">選択してください</option>
           {prefectures.map((p) => (
-            <option key={p} value={p}>{p}</option>
+            <option key={p} value={p}>
+              {p}
+            </option>
           ))}
         </select>
       </div>
@@ -182,27 +235,42 @@ const SearchForm = ({
       </div>
       <div>
         <label>災害種別: </label>
-        <select value={disasterType} onChange={(e) => setDisasterType(e.target.value)}>
+        <select
+          value={disasterType}
+          onChange={(e) => setDisasterType(e.target.value)}
+        >
           {disasterTypes.map((type) => (
-            <option key={type} value={type}>{type}</option>
+            <option key={type} value={type}>
+              {type}
+            </option>
           ))}
         </select>
       </div>
       {disasterType === "洪水" && (
         <div>
           <label>洪水の種類: </label>
-          <select value={floodDetailType} onChange={(e) => setFloodDetailType(e.target.value)}>
+          <select
+            value={floodDetailType}
+            onChange={(e) => setFloodDetailType(e.target.value)}
+          >
             {floodDetailOptions.map((option) => (
-              <option key={option.value} value={option.value}>{option.label}</option>
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
             ))}
           </select>
         </div>
       )}
       <div>
         <label>避難所の種別: </label>
-        <select value={shelterType} onChange={(e) => setShelterType(e.target.value)}>
+        <select
+          value={shelterType}
+          onChange={(e) => setShelterType(e.target.value)}
+        >
           {shelterTypeOptions.map((option) => (
-            <option key={option.value} value={option.value}>{option.label}</option>
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
           ))}
         </select>
       </div>

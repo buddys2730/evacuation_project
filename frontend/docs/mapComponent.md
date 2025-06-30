@@ -17,19 +17,18 @@ Google Map 上に以下の情報を可視化する：
 
 ## 📥 入力 Props
 
-| プロパティ名         | 型       | 必須 | 説明                                           |
-| -------------------- | -------- | ---- | ---------------------------------------------- |
-| `points`             | Array    | ✅   | 検索結果の避難所情報                           |
-| `selectedId`         | String   | ❌   | 選択中の避難所ID                               |
-| `route`              | Object   | ❌   | ルート情報（Directions API型）                 |
-| `radiusKm`           | Number   | ✅   | 検索範囲半径                                   |
-| `setRadiusKm`        | Function | ✅   | 半径変更                                       |
-| `setRoute`           | Function | ✅   | ルート設定                                     |
-| `onRouteClick`       | Function | ✅   | 経路クリック時                                 |
-| `hazardDisplayMode`  | String   | ✅   | ハザードマップ表示モード                       |
-| `searchParams`       | Object   | ✅   | 検索条件                                       |
-| `selectedCategories` | Array    | ✅   | ハザードカテゴリ                               |
-
+| プロパティ名         | 型       | 必須 | 説明                           |
+| -------------------- | -------- | ---- | ------------------------------ |
+| `points`             | Array    | ✅   | 検索結果の避難所情報           |
+| `selectedId`         | String   | ❌   | 選択中の避難所ID               |
+| `route`              | Object   | ❌   | ルート情報（Directions API型） |
+| `radiusKm`           | Number   | ✅   | 検索範囲半径                   |
+| `setRadiusKm`        | Function | ✅   | 半径変更                       |
+| `setRoute`           | Function | ✅   | ルート設定                     |
+| `onRouteClick`       | Function | ✅   | 経路クリック時                 |
+| `hazardDisplayMode`  | String   | ✅   | ハザードマップ表示モード       |
+| `searchParams`       | Object   | ✅   | 検索条件                       |
+| `selectedCategories` | Array    | ✅   | ハザードカテゴリ               |
 
 ## 📤 出力内容
 

@@ -3,5 +3,5 @@ export async function fetchCities() {
   const data = await res.json();
   // APIが { cities: [...] } 形式なら return data.cities
   // 配列なら return data
-  return Array.isArray(data) ? data : (data.cities || []);
+  return Array.isArray(data) ? data : data.cities || [];
 }
