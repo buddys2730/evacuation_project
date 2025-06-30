@@ -45,6 +45,7 @@
     }
   }
 ]
+```
 
 2. 災害状況CSVエクスポート
 GET /admin/disaster-situations/export
