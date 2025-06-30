@@ -13,6 +13,7 @@
 `GET /admin/disaster-situations`
 
 - **クエリパラメータ**
+
   - `city` … 市区町村名（例："福山市"）
   - `disaster_type` … 災害種別（例："洪水"）
   - `danger_level` … 危険度（例："高"）
@@ -35,7 +36,6 @@
     "geometry": { /* GeoJSON */ }
   }
 ]
-
 2. 災害状況CSVエクスポート
 GET /admin/disaster-situations/export
 
@@ -43,7 +43,6 @@ GET /admin/disaster-situations/export
 CSV例
 id,disaster_type,danger_level,address_label,occurred_at,cleared_at,comment,geometry
 1,洪水,高,松永町3丁目15番地辺り,2025-06-06T01:00:00,,道路冠水,"POLYGON((...))"
-
 3. 市区町村リスト取得
 GET /api/cities?pref=都道府県名
 
@@ -51,7 +50,6 @@ GET /api/cities?pref=都道府県名
 [
   { "code": "34207", "name": "福山市" }
 ]
-
 4. 災害種別/危険度リスト
 クライアント固定、または必要に応じてAPI化可能
 備考
