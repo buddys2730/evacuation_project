@@ -3,16 +3,17 @@ import React, { useEffect, useRef } from "react";
 const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
 export default function DisasterMapGoogle({
-  center = { lat: 34.3963, lng: 132.4596 }, // 福山市デフォルト
+  center = { lat: 34.3963, lng: 132.4596 },
   polygons = [],
+  selectedId,
+  onPolygonClick,
   onPolygonChange
 }) {
   const mapRef = useRef();
-  const mapInstance = useRef(null); // ← 追加
+  const mapInstance = useRef(null);
   const drawingManagerRef = useRef();
   const polygonsRef = useRef([]);
 
-  // Google Mapsライブラリ読込&初期化
   useEffect(() => {
     if (!window.google) {
       const script = document.createElement("script");
@@ -25,7 +26,6 @@ export default function DisasterMapGoogle({
     }
 
     function initMap() {
-      // 既に地図が存在する場合は再初期化しない
       if (!mapInstance.current) {
         mapInstance.current = new window.google.maps.Map(mapRef.current, {
           center,
@@ -33,7 +33,6 @@ export default function DisasterMapGoogle({
           mapTypeId: "roadmap"
         });
 
-        // DrawingManager導入
         drawingManagerRef.current = new window.google.maps.drawing.DrawingManager({
           drawingMode: window.google.maps.drawing.OverlayType.POLYGON,
           drawingControl: true,
@@ -51,14 +50,12 @@ export default function DisasterMapGoogle({
         });
         drawingManagerRef.current.setMap(mapInstance.current);
 
-        // Polygon追加イベント
         window.google.maps.event.addListener(
           drawingManagerRef.current,
           "polygoncomplete",
           function (polygon) {
-            // PolygonをGeoJSONへ変換
             const path = polygon.getPath().getArray().map(({ lat, lng }) => [lng(), lat()]);
-            path.push(path[0]); // 閉じる
+            path.push(path[0]);
             const geojson = {
               type: "Polygon",
               coordinates: [path],
@@ -70,7 +67,6 @@ export default function DisasterMapGoogle({
       }
     }
 
-    // クリーンアップ
     return () => {
       if (drawingManagerRef.current) drawingManagerRef.current.setMap(null);
       polygonsRef.current.forEach(p => p.setMap(null));
@@ -78,32 +74,49 @@ export default function DisasterMapGoogle({
     // eslint-disable-next-line
   }, []);
 
-  // centerが変更された場合、地図を移動
   useEffect(() => {
     if (mapInstance.current && center) {
       mapInstance.current.setCenter(center);
     }
   }, [center]);
 
-  // polygonsが変更された場合、ポリゴン描画
+  // ポリゴン描画＆クリック連携
   useEffect(() => {
     if (!mapInstance.current) return;
-    polygonsRef.current.forEach(p => p.setMap(null)); // 既存削除
+    polygonsRef.current.forEach(p => p.setMap(null));
     polygonsRef.current = polygons.map(geojson => {
       const paths = geojson.coordinates[0].map(([lng, lat]) => ({ lat, lng }));
+      const isSelected = geojson.id && geojson.id === selectedId;
+      const isCleared = geojson.isCleared;
+      // 色分け
+      let strokeColor = "#FF3333";
+      let fillColor = "#FF3333";
+      let fillOpacity = 0.25;
+      if (isCleared) {
+        strokeColor = "#1976d2";
+        fillColor = "#71a7ff";
+        fillOpacity = 0.38;
+      }
+      if (isSelected) {
+        strokeColor = "#d00";
+        fillOpacity = 0.45;
+      }
       const poly = new window.google.maps.Polygon({
         paths,
-        strokeColor: "#FF3333",
-        strokeOpacity: 0.8,
+        strokeColor,
+        strokeOpacity: 0.9,
         strokeWeight: 2,
-        fillColor: "#FF3333",
-        fillOpacity: 0.25,
+        fillColor,
+        fillOpacity,
         editable: false,
         map: mapInstance.current,
       });
+      if (geojson.id && onPolygonClick) {
+        window.google.maps.event.addListener(poly, "click", () => onPolygonClick(geojson.id));
+      }
       return poly;
     });
-  }, [polygons]);
+  }, [polygons, selectedId, onPolygonClick]);
 
   return (
     <div>

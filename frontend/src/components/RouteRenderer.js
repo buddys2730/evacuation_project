@@ -4,7 +4,6 @@ import { Polyline } from "@react-google-maps/api";
 /**
  * 区間ごと色分けで描画（sections形式を推奨）
  * sections: [{ danger: true/false, coords: [[lng, lat], ...] }]
- * 旧dangerZones/roadClosuresも併用可能
  */
 export default function RouteRenderer({
   route,
@@ -14,6 +13,20 @@ export default function RouteRenderer({
   status,
   recommendation,
 }) {
+  // route配列でもPolyline描画
+  const plainRouteLine =
+    Array.isArray(route) && route.length > 1 ? (
+      <Polyline
+        path={route}
+        options={{
+          strokeColor: status === "all_danger" ? "#FF3B30" : "#1976D2",
+          strokeWeight: 7,
+          strokeOpacity: 0.9,
+          zIndex: 1,
+        }}
+      />
+    ) : null;
+
   // sectionsで区間ごと色分け
   const sectionLines = (sections || []).map((sec, i) => (
     <Polyline
@@ -28,7 +41,7 @@ export default function RouteRenderer({
     />
   ));
 
-  // 旧dangerZonesも念のため重ね描画（点線で強調）
+  // 旧dangerZonesも重ね描画
   const dangerLines = (dangerZones || []).map((dz, i) => (
     <Polyline
       key={"danger-" + i}
@@ -69,13 +82,10 @@ export default function RouteRenderer({
 
   return (
     <>
-      {/* セクション分割・色分け表示 */}
+      {plainRouteLine}
       {sectionLines}
-      {/* 通行止め・危険区間を太線等で重ね強調 */}
       {dangerLines}
       {blockedLines}
-      {/* 推奨文表示（必要なら追加UI対応） */}
-      {/* <div className="recommendation">{recommendation}</div> */}
     </>
   );
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 const API_BASE = process.env.REACT_APP_API_BASE_URL || "";
 
 console.log("【Debug】API_BASE = ", API_BASE);
+
 // 詳細編集モーダル
 function ShelterDetailModal({
   open, onClose, shelter, supplies, crowdLevel,
@@ -22,7 +23,12 @@ function ShelterDetailModal({
     }}>
       <div style={{ background: "#fff", padding: 24, borderRadius: 10, minWidth: 450, maxWidth: 700 }}>
         <h3>{shelter.name}（{shelter.address}）</h3>
-        <div><b>標高：</b>{shelter.elevation ?? "未登録"}</div>
+        <div>
+          <b>標高：</b>
+          {shelter.elevation !== undefined && shelter.elevation !== null
+            ? Number(shelter.elevation).toFixed(1)
+            : "未登録"}
+        </div>
         <hr />
         {/* 混雑度管理 */}
         <form style={{ margin: "12px 0" }} onSubmit={e => { e.preventDefault(); onUpdateCrowd(editingCrowd); }}>
@@ -87,6 +93,13 @@ export default function AdminDashboard() {
   const [page, setPage] = useState(1);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [detailShelter, setDetailShelter] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const today = new Date();
+    return today.toISOString().slice(0, 10);
+  });
+  // ソート
+  const [sortKey, setSortKey] = useState("");
+  const [sortAsc, setSortAsc] = useState(true);
 
   // 都道府県リスト取得
   useEffect(() => {
@@ -134,14 +147,14 @@ export default function AdminDashboard() {
       .catch(() => setSearchResults([]));
   };
 
-  // 必要物資・混雑度まとめ取得（ページ表示分のみ）
+  // 必要物資・混雑度まとめ取得（ページ表示分のみ/日付指定対応/リアルタイム反映）
   useEffect(() => {
     const startIdx = (page - 1) * perPage;
     const endIdx = Math.min(startIdx + perPage, searchResults.length);
     const pageItems = searchResults.slice(startIdx, endIdx);
 
     Promise.all(pageItems.map(s =>
-      fetch(`${API_BASE}/api/admin/supplies?shelter_id=${s.id}`)
+      fetch(`${API_BASE}/api/admin/supplies?shelter_id=${s.id}&date=${selectedDate}`)
         .then(r => r.json())
         .then(data => ({ id: s.id, supplies: Array.isArray(data) ? data : [] }))
         .catch(() => ({ id: s.id, supplies: [] }))
@@ -152,7 +165,7 @@ export default function AdminDashboard() {
     });
 
     Promise.all(pageItems.map(s =>
-      fetch(`${API_BASE}/api/admin/crowd?shelter_id=${s.id}`)
+      fetch(`${API_BASE}/api/admin/crowd?shelter_id=${s.id}&date=${selectedDate}`)
         .then(r => r.json())
         .then(data => ({ id: s.id, crowd: data.crowd_level || "未登録" }))
         .catch(() => ({ id: s.id, crowd: "未登録" }))
@@ -161,7 +174,7 @@ export default function AdminDashboard() {
       results.forEach(r => { map[r.id] = r.crowd; });
       setCrowdMap(map);
     });
-  }, [searchResults, page, perPage]);
+  }, [searchResults, page, perPage, selectedDate]);
 
   // 詳細編集系
   const handleOpenModal = s => {
@@ -172,7 +185,7 @@ export default function AdminDashboard() {
     setDetailModalOpen(false);
     setDetailShelter(null);
   };
-  // 混雑度更新
+  // 混雑度更新（即反映）
   const handleUpdateCrowd = (crowd) => {
     fetch(`${API_BASE}/api/admin/crowd`, {
       method: "POST",
@@ -181,6 +194,8 @@ export default function AdminDashboard() {
     }).then(() => {
       setCrowdMap(m => ({ ...m, [detailShelter.id]: crowd }));
       alert("混雑度を登録・更新しました");
+      // 再取得で即時反映
+      setTimeout(() => handleSearch(), 300); // 反映遅延防止
     });
   };
   // 物資個数変更
@@ -196,6 +211,7 @@ export default function AdminDashboard() {
           s.id === supplyId ? { ...s, quantity: Number(quantity) } : s
         )
       }));
+      setTimeout(() => handleSearch(), 300);
     });
   };
   // 物資削除
@@ -209,6 +225,7 @@ export default function AdminDashboard() {
         ...m,
         [detailShelter.id]: (m[detailShelter.id] || []).filter(s => s.id !== supplyId)
       }));
+      setTimeout(() => handleSearch(), 300);
     });
   };
   // 物資追加
@@ -224,6 +241,7 @@ export default function AdminDashboard() {
           ...m,
           [detailShelter.id]: [...(m[detailShelter.id] || []), newSupply]
         }));
+        setTimeout(() => handleSearch(), 300);
       });
   };
 
@@ -233,9 +251,38 @@ export default function AdminDashboard() {
   const startIdx = (page - 1) * perPage;
   const endIdx = Math.min(startIdx + perPage, total);
 
+  // ソート処理
+  const sortedResults = [...searchResults].sort((a, b) => {
+    if (!sortKey) return 0;
+    let va = a[sortKey], vb = b[sortKey];
+    // null/undefinedを最下位へ
+    if (va === undefined || va === null) return 1;
+    if (vb === undefined || vb === null) return -1;
+    // 数値 or 文字列でソート
+    if (!isNaN(Number(va)) && !isNaN(Number(vb))) {
+      return sortAsc ? Number(va) - Number(vb) : Number(vb) - Number(va);
+    }
+    // 文字列
+    return sortAsc ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
+  });
+
   return (
     <div style={{ padding: 32, fontFamily: "sans-serif" }}>
       <h2>管理ダッシュボード</h2>
+      {/* 日付スライダー */}
+      <div style={{ margin: "16px 0" }}>
+        <label>表示日付：</label>
+        <input
+          type="date"
+          value={selectedDate}
+          max={new Date().toISOString().slice(0, 10)}
+          onChange={e => setSelectedDate(e.target.value)}
+          style={{ marginLeft: 8 }}
+        />
+        <span style={{ marginLeft: 14, color: "#666" }}>
+          （過去を選択するとその時点の混雑度・物資を表示）
+        </span>
+      </div>
       <div>
         <label>都道府県:{" "}
           <select value={selectedPref} onChange={e => setSelectedPref(e.target.value)}>
@@ -276,25 +323,35 @@ export default function AdminDashboard() {
         <span style={{ marginLeft: 16 }}>{page} / {totalPages}ページ</span>
       </div>
 
-      {/* 検索結果：テーブル表示 */}
+      {/* 検索結果：テーブル表示（ソート対応） */}
       <div style={{ overflowX: "auto" }}>
         <table border={1} cellPadding={6} cellSpacing={0} style={{ borderCollapse: "collapse", width: "100%", minWidth: 950, background: "#fafcff" }}>
           <thead style={{ background: "#e3ecfc" }}>
             <tr>
-              <th>名称</th>
-              <th>住所</th>
-              <th>標高</th>
+              <th style={{ cursor: "pointer" }} onClick={() => { setSortKey("name"); setSortAsc(k => sortKey === "name" ? !k : true); }}>
+                名称{sortKey === "name" && (sortAsc ? "▲" : "▼")}
+              </th>
+              <th style={{ cursor: "pointer" }} onClick={() => { setSortKey("address"); setSortAsc(k => sortKey === "address" ? !k : true); }}>
+                住所{sortKey === "address" && (sortAsc ? "▲" : "▼")}
+              </th>
+              <th style={{ cursor: "pointer" }} onClick={() => { setSortKey("elevation"); setSortAsc(k => sortKey === "elevation" ? !k : true); }}>
+                標高{sortKey === "elevation" && (sortAsc ? "▲" : "▼")}
+              </th>
               <th>必要物資</th>
               <th>混雑度</th>
               <th>編集</th>
             </tr>
           </thead>
           <tbody>
-            {searchResults.slice(startIdx, endIdx).map(s => (
+            {sortedResults.slice(startIdx, endIdx).map(s => (
               <tr key={s.id}>
                 <td>{s.name}</td>
                 <td>{s.address}</td>
-                <td>{s.elevation !== undefined && s.elevation !== null ? s.elevation : "未登録"}</td>
+                <td>
+                  {s.elevation !== undefined && s.elevation !== null
+                    ? Number(s.elevation).toFixed(1)
+                    : "未登録"}
+                </td>
                 <td>
                   {suppliesMap[s.id] && suppliesMap[s.id].length > 0
                     ? suppliesMap[s.id].map(item => `${item.item_name}（${item.quantity}個）`).join("，")

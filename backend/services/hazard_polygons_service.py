@@ -20,7 +20,9 @@ def hazard_polygons():
         return jsonify({"error": "必須パラメータ(category, lat, lng, prefecture)が不足しています"}), 400
     
     try:
-        radius = radius_km * 1000  # SQL内で使うのはメートル
+        # radius = radius_km * 1000  # SQL内で使うのはメートル
+        radius = 10000
+        print(f"[DEBUG] hazard_polygons SQL params: category={category}, lat={lat}, lng={lng}, radius={radius}, prefecture={prefecture}")
         conn = get_db_connection()
         cur = conn.cursor()
         sql = """

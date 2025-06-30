@@ -45,28 +45,30 @@ const SearchForm = ({
 
   // 都道府県変更時に市区町村リストを取得
   useEffect(() => {
-    if (!pref) {
+  if (!pref) {
+    setCityList([]);
+    setCity("");
+    return;
+  }
+  const fetchCities = async () => {
+    try {
+      // パラメータ名を「prefecture」に修正
+      const res = await axios.get(
+        `${config.API_BASE_URL}/api/cities?prefecture=${encodeURIComponent(pref)}`
+      );
+      // 返り値が cities でなく直接配列なら下の行だけ変更
+      const cityArray = Array.isArray(res.data.cities)
+        ? res.data.cities
+        : (Array.isArray(res.data) ? res.data : []);
+      setCityList(cityArray);
+      setCity("");
+    } catch (e) {
       setCityList([]);
       setCity("");
-      return;
     }
-    const fetchCities = async () => {
-      try {
-        // === ここで都道府県を明示的にエンコード ===
-        const res = await axios.get(
-          `${config.API_BASE_URL}/api/cities?pref=${encodeURIComponent(pref)}`
-        );
-        // res.data.citiesは [{name, code}]形式
-        const cityArray = Array.isArray(res.data.cities) ? res.data.cities : [];
-        setCityList(cityArray);
-        setCity(""); // リセット
-      } catch (e) {
-        setCityList([]);
-        setCity("");
-      }
-    };
-    fetchCities();
-  }, [pref]);
+  };
+  fetchCities();
+}, [pref]);
 
   // 初期位置取得
   useEffect(() => {

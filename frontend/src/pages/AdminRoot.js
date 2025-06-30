@@ -30,6 +30,7 @@ export default function AdminRoot() {
           災害状況管理
         </button>
       </div>
+      {/* ▼ タブ切替で必ず最新版DisasterSituationDashboardを表示 */}
       {tab === "shelter" && <AdminDashboard />}
       {tab === "disaster" && <DisasterSituationDashboard />}
     </div>

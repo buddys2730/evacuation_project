@@ -31,8 +31,16 @@ from routes.city_center import city_center_bp
 from routes.admin_supplies import bp as admin_supplies_bp
 from routes.master_data import master_data_bp
 from routes.disaster_situations import bp as disaster_situations_bp
+from routes.user_supplies import user_supplies_bp
 
 app = Flask(__name__)
+
+# ここで「JSONをUTF-8のまま返す」設定を追加
+app.config['JSON_AS_ASCII'] = False
+try:
+    app.json.ensure_ascii = False
+except Exception:
+    pass  # Flaskのバージョンによっては属性がない場合がある
 
 # Cloudflare Tunnel・ローカル両対応 CORS完全許可
 CORS(
@@ -40,7 +48,7 @@ CORS(
     origins="*",
     supports_credentials=True,
     allow_headers=["Content-Type", "Authorization"],
-    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]  # ← PATCHを必ず追加
 )
 
 # Blueprint登録（「/api/cities」競合回避のためcity_bpを一番最後にする）
@@ -49,7 +57,7 @@ app.register_blueprint(route_check_service)
 app.register_blueprint(route_safety_service)
 app.register_blueprint(disaster_zone_service)
 app.register_blueprint(hazard_category_bp)
-app.register_blueprint(hazard_polygons_service)
+# app.register_blueprint(hazard_polygons_service)
 app.register_blueprint(hazard_polygons_bp)
 app.register_blueprint(route_service)
 app.register_blueprint(hazard_zone_service)    # city_bpの前
@@ -58,6 +66,7 @@ app.register_blueprint(admin_supplies_bp)
 app.register_blueprint(master_data_bp)
 app.register_blueprint(city_center_bp)
 app.register_blueprint(disaster_situations_bp)
+app.register_blueprint(user_supplies_bp)
 
 # 健康チェックやトップページ確認用ルート（必要なら追加）
 @app.route("/")

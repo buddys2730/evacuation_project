@@ -22,7 +22,9 @@ function UserApp() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [routeMessage, setRouteMessage] = useState({ recommendation: "", status: "" });
   const [showSafeRouteBtn, setShowSafeRouteBtn] = useState(false);
-  const [alternateShelters, setAlternateShelters] = useState([]); // 新規
+  const [alternateShelters, setAlternateShelters] = useState([]);
+  const [suppliesMap, setSuppliesMap] = useState({});
+  const [crowdMap, setCrowdMap] = useState({});
   const navigate = useNavigate();
 
   const minRadius = 1;
@@ -78,13 +80,11 @@ function UserApp() {
       });
       setDialogOpen(true);
     }
-    // 危険ルートなら安全ルートボタン表示
     if (routeResult && routeResult.status === "danger") {
       setShowSafeRouteBtn(true);
     } else {
       setShowSafeRouteBtn(false);
     }
-    // 通行止め時、到達可能避難所候補
     if (routeResult && routeResult.status === "blocked" && Array.isArray(routeResult.alternate_shelters)) {
       setAlternateShelters(routeResult.alternate_shelters);
     } else {
@@ -134,7 +134,6 @@ function UserApp() {
         });
         setDialogOpen(true);
       }
-      // 通行止め時の候補
       if (data && data.status === "blocked" && Array.isArray(data.alternate_shelters)) {
         setAlternateShelters(data.alternate_shelters);
       } else {
@@ -177,7 +176,6 @@ function UserApp() {
       );
       const data = await response.json();
       setRoute(data);
-      // 通行止めなら再度候補リスト（無限ループ防止にmax回数制限も可）
       if (data && data.status === "blocked" && Array.isArray(data.alternate_shelters)) {
         setAlternateShelters(data.alternate_shelters);
       } else {
@@ -283,61 +281,6 @@ function UserApp() {
         </div>
       )}
 
-      {/* 危険ルート時に警告・安全なルート提案・ARボタン表示 */}
-      {route && route.status === "danger" && (
-  <div style={{ color: "red", fontWeight: "bold", margin: "12px 0" }}>
-    このルートは<b>危険</b>です。
-    {route.danger_level && <span> 危険度: {route.danger_level}</span>}
-    {route.depth_m && <span> 水深: {route.depth_m}m</span>}
-    <br />
-    {showSafeRouteBtn && (
-      <button
-        onClick={handleFindSafeRoute}
-        style={{ marginTop: 8, fontWeight: "bold" }}
-      >
-        安全なルートを探す
-      </button>
-    )}
-    {/* ▼AR案内ボタンを危険ルートにも表示 */}
-    <button
-      onClick={handleAR}
-      style={{
-        marginLeft: 12,
-        fontWeight: "bold",
-        background: "#d84315",
-        color: "#fff",
-        padding: "4px 16px",
-        border: "none",
-        borderRadius: "6px",
-      }}
-    >
-      警告を理解した上でAR案内
-    </button>
-  </div>
-)}
-
-
-      {/* 安全ルート時にAR案内ボタン表示 */}
-      {route && route.status === "safe" && (
-        <div style={{ color: "green", fontWeight: "bold", margin: "12px 0" }}>
-          このルートは<b>安全</b>です。
-          <button
-            onClick={handleAR}
-            style={{
-              marginLeft: 12,
-              fontWeight: "bold",
-              background: "#43a047",
-              color: "#fff",
-              padding: "4px 16px",
-              border: "none",
-              borderRadius: "6px",
-            }}
-          >
-            AR案内を開始
-          </button>
-        </div>
-      )}
-
       <MapComponent
         points={results}
         selectedId={selectedId}
@@ -350,6 +293,13 @@ function UserApp() {
         searchParams={searchParams}
         selectedCategories={selectedCategories}
         userLocation={userLocation}
+        suppliesMap={suppliesMap}
+        setSuppliesMap={setSuppliesMap}
+        crowdMap={crowdMap}
+        setCrowdMap={setCrowdMap}
+        showSafeRouteBtn={showSafeRouteBtn}
+        onFindSafeRoute={handleFindSafeRoute}
+        onAR={handleAR}
       />
 
       {results.length > 0 && (
@@ -357,8 +307,11 @@ function UserApp() {
           points={results}
           selectedId={selectedId}
           onSelect={handleSelectPoint}
+          suppliesMap={suppliesMap}
+          crowdMap={crowdMap}
         />
       )}
+
       {/* ルート警告ダイアログ */}
       <RouteAlertDialog
         open={dialogOpen}
@@ -370,7 +323,6 @@ function UserApp() {
   );
 }
 
-// App本体で「ルートの切り替え」のみ行う
 export default function App() {
   return (
     <Routes>

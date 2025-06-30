@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>ARカメラテスト・最終完全版</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    html, body { height: 100%; background: #1a1a1a; color: #fff; margin: 0; }
+    .main-btn {
+      font-size: 1.2em; margin: 40px auto; padding: 18px 40px;
+      background: linear-gradient(90deg, #1d62f0, #a013ce);
+      border: none; border-radius: 16px; color: #fff;
+      display: block; font-weight: bold; box-shadow: 0 2px 12px #0006;
+      cursor: pointer;
+    }
+    video { width: 94vw; max-width: 420px; margin: 40px auto 0 auto; display: block; background: #000; border-radius: 12px; }
+    .msg { margin: 24px auto 0 auto; max-width: 400px; color: #ffd776; font-size: 1.1em; text-align: center; }
+  </style>
+</head>
+<body>
+  <button class="main-btn" id="startBtn">カメラ起動（タップ必須）</button>
+  <video id="video" autoplay playsinline muted></video>
+  <div class="msg" id="msg"></div>
+  <script>
+    const btn = document.getElementById('startBtn');
+    const video = document.getElementById('video');
+    const msg = document.getElementById('msg');
+    let tried = false;
+
+    async function startCamera() {
+      msg.innerHTML = "";
+      btn.disabled = true;
+      try {
+        // iOS16以降用センサー許可（出るなら出す、出なくても進む）
+        if (typeof DeviceOrientationEvent !== "undefined" &&
+            typeof DeviceOrientationEvent.requestPermission === "function") {
+          try { await DeviceOrientationEvent.requestPermission(); } catch(e){}
+        }
+        // メインカメラ要求（前面/背面どちらでもOKにする）
+        let constraints = {
+          video: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1280 }, height: { ideal: 720 }
+          },
+          audio: false
+        };
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream;
+        msg.innerHTML = "カメラ許可成功！AR動作可能です。";
+      } catch(e) {
+        msg.innerHTML = "<b>カメラが使えません:</b><br>" + e.name + "<br>" + (e.message || "");
+        // カメラ許可自体が出ない場合の追加ガイド
+        if (
+          e.name === "NotAllowedError" ||
+          e.name === "NotFoundError" ||
+          e.name === "OverconstrainedError"
+        ) {
+          msg.innerHTML += "<br><br>iPhoneの場合:<br>・画面上部「AA」→「Webサイトの設定」→カメラを『許可』<br>・設定アプリ→Safari→カメラも確認<br><br>Android/PCの場合:<br>・アドレスバー左の鍵アイコン→サイトの設定→カメラを『許可』";
+        }
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    btn.addEventListener('click', () => {
+      if(tried) return;
+      tried = true;
+      startCamera();
+    });
+
+    // ページ初回ロード時に自動で「一度だけ」カメラ起動を促す
+    setTimeout(() => {
+      if (!tried) {
+        msg.innerHTML = "【初めての場合は必ず「カメラ起動」ボタンをタップしてください】<br>Safari/iPhoneではユーザー操作が必須です。";
+      }
+    }, 1200);
+
+    // iOS用 device-orientation 許可ガイド
+    window.addEventListener('touchend', () => {
+      if (typeof DeviceOrientationEvent !== "undefined" &&
+          typeof DeviceOrientationEvent.requestPermission === "function") {
+        DeviceOrientationEvent.requestPermission().catch(()=>{});
+      }
+    }, { once: true });
+  </script>
+</body>
+</html>
