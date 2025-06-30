@@ -13,6 +13,12 @@
 - `lint-staged` によるステージ済みファイル限定チェック
 - `.md_rules.json` による Markdown 構文と契約違反チェック
 
+## データ保存・Git運用方針
+- database/seed_data/ 配下の全SQL、GeoJSON、CSV等の大容量ファイルは **絶対に削除しないこと**
+- .gitignoreで管理し、GitHubへはpushしない（GitHub上には存在しなくてOK）
+- データの共有・配布はクラウドストレージや物理メディアで行うこと
+- 誤って消した場合は必ずバックアップから復元すること
+
 ---
 
 ### ✅ 契約条件
