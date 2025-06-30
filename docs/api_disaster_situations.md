@@ -13,13 +13,15 @@
 `GET /admin/disaster-situations`
 
 - **クエリパラメータ**
-    - `city` … 市区町村名（例："福山市"）
-    - `disaster_type` … 災害種別（例："洪水"）
-    - `danger_level` … 危険度（例："高"）
-    - `from` … 開始日（例："2025-06-01"）
-    - `to` … 終了日（例："2025-06-10"）
+
+  - `city` … 市区町村名（例："福山市"）
+  - `disaster_type` … 災害種別（例："洪水"）
+  - `danger_level` … 危険度（例："高"）
+  - `from` … 開始日（例："2025-06-01"）
+  - `to` … 終了日（例："2025-06-10"）
 
 - **レスポンスサンプル**
+
 ```json
 [
   {
@@ -65,11 +67,12 @@ GET /api/cities?pref=都道府県名
 ---
 
 # 使い方
-- それぞれ`docs/disaster_situation_dashboard.md`  
+- それぞれ`docs/disaster_situation_dashboard.md`
 　`docs/api_disaster_situations.md`などのファイル名で保存してください。
 - 必要に応じて運用マニュアルやFAQも追加可能です。
 
 ---
 
-**これらを基礎に、今後の設計/引き継ぎ/機能追加も明文化できます。  
+**これらを基礎に、今後の設計/引き継ぎ/機能追加も明文化できます。
 実装も引き続き進めます。**
+```

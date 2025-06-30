@@ -3,26 +3,27 @@
 ---
 
 ## 用途
+
 動的な災害状況（浸水、通行止め、土砂災害等）の発生範囲・属性を管理し、ルート案内等リアルタイム連携を実現する。
 
 ---
 
 ## カラム定義
 
-| カラム名        | 型                   | 備考                                           |
-|-----------------|----------------------|------------------------------------------------|
-| id              | SERIAL               | PK                                             |
-| disaster_type   | character varying    | 災害種別（浸水／通行止め／土砂／崖崩れ等）    |
-| danger_level    | character varying    | 危険度（例：低／中／高／数値可）               |
-| depth_m         | double precision     | 浸水深さ（単位：m、浸水時のみ。NULL可）        |
-| is_closed       | boolean              | 通行止め判定（道路災害時：true/false、NULL可） |
-| geometry        | geometry             | 範囲情報（Point／LineString／Polygon対応）     |
-| occurred_at     | timestamp            | 発生日                                         |
-| cleared_at      | timestamp            | 解除日                                         |
-| comment         | text                 | 管理者コメント                                 |
-| image_url       | text                 | 現場写真URL                                    |
-| created_at      | timestamp            | レコード登録日時                               |
-| updated_at      | timestamp            | レコード更新日時                               |
+| カラム名      | 型                | 備考                                           |
+| ------------- | ----------------- | ---------------------------------------------- |
+| id            | SERIAL            | PK                                             |
+| disaster_type | character varying | 災害種別（浸水／通行止め／土砂／崖崩れ等）     |
+| danger_level  | character varying | 危険度（例：低／中／高／数値可）               |
+| depth_m       | double precision  | 浸水深さ（単位：m、浸水時のみ。NULL可）        |
+| is_closed     | boolean           | 通行止め判定（道路災害時：true/false、NULL可） |
+| geometry      | geometry          | 範囲情報（Point／LineString／Polygon対応）     |
+| occurred_at   | timestamp         | 発生日                                         |
+| cleared_at    | timestamp         | 解除日                                         |
+| comment       | text              | 管理者コメント                                 |
+| image_url     | text              | 現場写真URL                                    |
+| created_at    | timestamp         | レコード登録日時                               |
+| updated_at    | timestamp         | レコード更新日時                               |
 
 ---
 
